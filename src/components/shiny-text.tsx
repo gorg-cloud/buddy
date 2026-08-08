@@ -22,7 +22,7 @@ export function ShinyText({
     <span
       className={cn(
         "shiny-text bg-clip-text text-transparent",
-        "bg-[linear-gradient(110deg,currentColor_45%,rgba(248,245,236,0.85)_50%,currentColor_55%)] bg-[length:200%_100%]",
+        "bg-[linear-gradient(110deg,currentColor_45%,rgba(156,90,0,0.55)_50%,currentColor_55%)] bg-[length:200%_100%]",
         disabled && "bg-none",
         className
       )}
