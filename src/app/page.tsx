@@ -3,7 +3,9 @@ import { ArrowRight } from "lucide-react";
 
 import { ArrivalBoard } from "@/components/arrival-board";
 import { Barcode } from "@/components/barcode";
+import { ShinyText } from "@/components/shiny-text";
 import { Signage } from "@/components/signage";
+import { StatStrip } from "@/components/stat-strip";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
@@ -102,7 +104,7 @@ export default function Home() {
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                 <Button size="lg" asChild>
                   <Link href="/signup">
-                    Get a buddy <ArrowRight />
+                    <ShinyText text="Get a buddy" /> <ArrowRight />
                   </Link>
                 </Button>
                 <Button size="lg" variant="outline" asChild>
@@ -158,6 +160,9 @@ export default function Home() {
                   <ChainStub key={item.no} {...item} />
                 ))}
               </div>
+            </div>
+            <div className="mt-10">
+              <StatStrip />
             </div>
             <p className="board mt-10 text-[11px] tracking-[0.2em] text-ink/55">
               Everyone who was helped, helps. The only stat that matters is
@@ -355,7 +360,7 @@ export default function Home() {
             <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button size="lg" asChild>
                 <Link href="/signup">
-                  Get your buddy <ArrowRight />
+                  <ShinyText text="Get your buddy" /> <ArrowRight />
                 </Link>
               </Button>
               <Button

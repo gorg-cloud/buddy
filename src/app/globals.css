@@ -357,6 +357,20 @@
   background: var(--muted) !important;
 }
 
+/* React Bits ShinyText — light sweeping across a printed ticket */
+@keyframes shiny-text {
+  0% {
+    background-position: -200% 100%;
+  }
+  100% {
+    background-position: 200% 100%;
+  }
+}
+
+.shiny-text {
+  animation: shiny-text var(--shiny-speed, 6s) ease-in-out infinite;
+}
+
 /* Slow pulse for "waiting for buddy" status */
 @keyframes pulse-soft {
   0%,
@@ -406,6 +420,9 @@
   }
   .buddy-pin__ring {
     animation: none !important;
+  }
+  .shiny-text {
+    animation: none;
   }
   * {
     scroll-behavior: auto !important;
