@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Info } from "lucide-react";
 
+import { Beams } from "@/components/beams";
 import { RippleMap } from "@/components/ripple-map";
 import { PageHeader } from "@/components/signage";
 import { SiteFooter } from "@/components/site-footer";
@@ -19,8 +20,13 @@ export default function MapPage() {
           lede="Anchors and peers around you — people who've been where you're going, and people moving the same way you are."
         />
 
-        <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
-          <RippleMap />
+        <section className="relative mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
+          {/* terminal light shafts on the dusk walls */}
+          <Beams className="pointer-events-none absolute inset-0 h-full w-full" />
+          <div className="relative">
+            <RippleMap />
+
+          </div>
 
           <div className="mt-10 flex flex-col items-start justify-between gap-6 border-2 border-ink/30 bg-paper p-8 shadow-[3px_3px_0_0_rgba(22,19,14,0.14)] sm:flex-row sm:items-center">
             <div className="flex items-start gap-3">

@@ -5,7 +5,9 @@ import dynamic from "next/dynamic";
 import { Anchor, Compass, Crosshair, Users } from "lucide-react";
 import { toast } from "sonner";
 
+import { CountUp } from "@/components/count-up";
 import { CountryPicker } from "@/components/country-picker";
+import { Noise } from "@/components/noise";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -106,9 +108,15 @@ export function RippleMap() {
           <p className="board text-[11px] tracking-[0.2em] text-ink/60">
             {loading
               ? "READING THE WORLD…"
-              : `THE WORLD — ${people.length} ${
-                  people.length === 1 ? "PERSON" : "PEOPLE"
-                } ON THIS VIEW`}
+              : people.length === 1
+                ? "THE WORLD — 1 PERSON ON THIS VIEW"
+                : (
+                    <>
+                      THE WORLD —{" "}
+                      <CountUp to={people.length} duration={1.2} /> PEOPLE ON
+                      THIS VIEW
+                    </>
+                  )}
           </p>
           <div className="flex items-center gap-3 text-[11px]">
             <span className="board inline-flex items-center gap-1.5 text-ink/60">
@@ -128,7 +136,11 @@ export function RippleMap() {
               </span>
             </div>
           ) : (
-            <MapView people={people} focus={focus} />
+            <>
+              <MapView people={people} focus={focus} />
+              {/* film grain over the night map */}
+              <Noise className="pointer-events-none absolute inset-0 z-[400] h-full w-full" />
+            </>
           )}
         </div>
 
