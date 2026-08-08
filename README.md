@@ -1,4 +1,4 @@
-Dont Do it Alone.
+## Dont Do it Alone.
 
 Ever since I was a child I never got the chance to stay still in a school or country, I always had to switch to somewhere else, just when I had started a life and made friends, something happens whether its was academic, covid or anything else. 
 
