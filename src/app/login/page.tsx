@@ -44,7 +44,12 @@ export default function LoginPage() {
       password,
     });
     if (error) {
-      toast.error(error.message);
+      toast.error(
+        error.message.includes("Invalid login") ||
+          error.message.includes("Email not confirmed")
+          ? "Wrong email or password — check both and try again"
+          : error.message
+      );
       setBusy(false);
       return;
     }

@@ -23,7 +23,6 @@ import {
   isSupabaseConfigured,
   type Session,
 } from "@/lib/auth";
-import { getSupabase } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
 type Role = Session["role"];
@@ -54,14 +53,16 @@ export default function SignupPage() {
       return;
     }
 
-    const supabase = getSupabase();
-    const { error } = await supabase!.auth.signUp({
-      email,
-      password,
-      options: { data: { name } },
+    // Server-side signup: creates the account, confirms the email, and
+    // signs the new kid in — no inbox waiting, straight into onboarding.
+    const res = await fetch("/api/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, password }),
     });
-    if (error) {
-      toast.error(error.message);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      toast.error(data.error ?? "Couldn't create your account — try again");
       setBusy(false);
       return;
     }
@@ -69,8 +70,8 @@ export default function SignupPage() {
     localStorage.setItem(ROLE_KEY, role);
     const session: Session = { name, email, role, onboarded: false };
     localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-    toast.success("Check your email to confirm your account");
-    router.push("/login");
+    toast.success("Welcome to the chain — let's build your profile");
+    router.push("/onboarding");
   }
 
   return (
@@ -197,6 +198,10 @@ export default function SignupPage() {
                 {busy ? "Creating…" : "Create my profile"}
                 {!busy && <ArrowRight />}
               </Button>
+              <p className="board text-center text-[10px] tracking-[0.15em] text-ink/45">
+                NO EMAIL CONFIRMATION — YOUR ACCOUNT WORKS THE SECOND YOU
+                HIT CREATE
+              </p>
               <p className="text-center text-xs text-muted-foreground">
                 Already have a buddy?{" "}
                 <Link href="/login" className="text-amber-deep hover:underline">
