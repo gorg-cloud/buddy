@@ -232,7 +232,7 @@ export default function OnboardingPage() {
                 {questions.map((q, i) => (
                   <div key={q.id} className="space-y-2">
                     <Label htmlFor={q.id}>
-                      <span className="board mr-2 text-amber">Q{i + 1}</span>
+                      <span className="board mr-2 text-amber-deep">Q{i + 1}</span>
                       {q.label}
                     </Label>
                     <Textarea
@@ -266,7 +266,7 @@ export default function OnboardingPage() {
         </Tabs>
 
         <p className="board mt-8 flex items-center gap-2 text-[11px] tracking-[0.15em] text-ink/55">
-          <ShieldCheck className="size-4 text-amber" />
+          <ShieldCheck className="size-4 text-amber-deep" />
           Your answers are only visible to your matches. Nothing is public.
         </p>
       </main>

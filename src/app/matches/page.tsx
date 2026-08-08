@@ -63,7 +63,7 @@ export default function MatchesPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-base">
-                      <Sparkles className="size-4 text-primary" />
+                      <Sparkles className="size-4 text-amber-deep" />
                       First hello
                     </CardTitle>
                   </CardHeader>
@@ -111,7 +111,7 @@ export default function MatchesPage() {
           ) : (
             <Card className="mx-auto max-w-lg text-center">
               <CardContent className="py-12">
-                <p className="board text-2xl text-primary">WAITING…</p>
+                <p className="board text-2xl text-amber-deep">WAITING…</p>
                 <p className="mt-3 text-muted-foreground">
                   Nobody at your destination has signed up as a buddy yet. Be
                   the first to arrive — or invite a friend at your new school

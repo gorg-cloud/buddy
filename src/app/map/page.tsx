@@ -24,7 +24,7 @@ export default function MapPage() {
 
           <div className="mt-10 flex flex-col items-start justify-between gap-6 border-2 border-ink/30 bg-paper p-8 shadow-[3px_3px_0_0_rgba(22,19,14,0.14)] sm:flex-row sm:items-center">
             <div className="flex items-start gap-3">
-              <Info className="mt-1 size-5 shrink-0 text-amber" />
+              <Info className="mt-1 size-5 shrink-0 text-amber-deep" />
               <div>
                 <h2 className="font-display text-xl uppercase tracking-wide">
                   Want to become an anchor?

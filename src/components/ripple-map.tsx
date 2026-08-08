@@ -287,7 +287,7 @@ export function RippleMap() {
 
         <Separator className="my-4" />
         <div className="flex items-start gap-3 text-sm text-muted-foreground">
-          <Compass className="mt-0.5 size-4 shrink-0 text-amber" />
+          <Compass className="mt-0.5 size-4 shrink-0 text-amber-deep" />
           <p>
             Anchors are kids who&apos;ve lived where you&apos;re going. Ask
             them anything: school, neighbourhoods, how to make friends fast.

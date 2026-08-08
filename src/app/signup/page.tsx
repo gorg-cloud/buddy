@@ -181,7 +181,7 @@ export default function SignupPage() {
               </Button>
               <p className="text-center text-xs text-muted-foreground">
                 Already have a buddy?{" "}
-                <Link href="/login" className="text-primary hover:underline">
+                <Link href="/login" className="text-amber-deep hover:underline">
                   Log in
                 </Link>
               </p>

@@ -39,7 +39,7 @@ export function ProfileCard({
             </p>
             <p className="board mt-1.5 flex items-center gap-1.5 text-[11px] tracking-[0.18em] text-ink/60">
               {profile.from}
-              <ArrowRight className="size-3 text-amber" />
+              <ArrowRight className="size-3 text-amber-deep" />
               {profile.to}
             </p>
           </div>
@@ -56,7 +56,7 @@ export function ProfileCard({
       <div className="flex-1 space-y-3 px-5 pb-5">
         {shown.map(([question, answer]) => (
           <div key={question} className="border border-ink/20 bg-muted/50 p-3">
-            <p className="board text-[10px] font-bold tracking-[0.18em] text-amber">
+            <p className="board text-[10px] font-bold tracking-[0.18em] text-amber-deep">
               {question}
             </p>
             <p className="mt-1 text-sm leading-relaxed text-ink/85">

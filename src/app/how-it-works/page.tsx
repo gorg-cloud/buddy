@@ -80,7 +80,7 @@ export default function HowItWorksPage() {
               <Card key={step.title} className="gap-0 overflow-hidden p-0">
                 <CardHeader className="border-b border-dashed border-ink/25">
                   <div className="flex items-center justify-between">
-                    <step.icon className="size-5 text-amber" />
+                    <step.icon className="size-5 text-amber-deep" />
                     <span className="board text-xl text-ink/30">
                       0{i + 1}
                     </span>
@@ -106,7 +106,7 @@ export default function HowItWorksPage() {
                   key={p.title}
                   className="border-2 border-ink/30 bg-paper p-6 shadow-[3px_3px_0_0_rgba(22,19,14,0.14)]"
                 >
-                  <p.icon className="size-5 text-amber" />
+                  <p.icon className="size-5 text-amber-deep" />
                   <h3 className="mt-4 font-display text-lg uppercase tracking-wide">
                     {p.title}
                   </h3>

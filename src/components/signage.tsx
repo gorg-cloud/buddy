@@ -48,7 +48,9 @@ export function PageHeader({
     <section className="relative overflow-hidden border-b-2 border-ink/80">
       <div className="terminal-grid absolute inset-0" aria-hidden />
       <div className="relative mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
-        {tag && <p className="board text-xs tracking-[0.22em] text-amber">{tag}</p>}
+        {tag && (
+          <p className="board text-xs tracking-[0.22em] text-amber-deep">{tag}</p>
+        )}
         <h1 className="mt-3 max-w-3xl font-display text-4xl uppercase leading-[1.02] tracking-tight text-ink sm:text-5xl md:text-6xl">
           {title}
         </h1>

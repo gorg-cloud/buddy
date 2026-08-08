@@ -61,7 +61,7 @@ export default function DashboardPage() {
               </div>
             ) : (
               <>
-                <p className="board text-xs text-primary">
+                <p className="board text-xs text-amber-deep">
                   ● YOUR LANDING · {me?.from ?? "—"} → {me?.to ?? "—"}
                 </p>
                 <div className="mt-4 flex flex-wrap items-end justify-between gap-6">
@@ -78,13 +78,13 @@ export default function DashboardPage() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <CalendarClock className="size-4 text-primary" />
+                    <CalendarClock className="size-4 text-amber-deep" />
                     {buddy ? (
                       <span>
                         Your buddy is{" "}
                         <Link
                           href="/matches"
-                          className="text-foreground underline underline-offset-4 hover:text-primary"
+                          className="text-foreground underline underline-offset-4 hover:text-amber-deep"
                         >
                           {buddy.name}
                         </Link>{" "}

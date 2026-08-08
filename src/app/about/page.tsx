@@ -17,7 +17,7 @@ export default function AboutPage() {
           title={
             <>
               I moved countries every 2–3 years.{" "}
-              <span className="text-amber">Every single time,</span> I built
+              <span className="text-amber-deep">Every single time,</span> I built
               my life from zero.
             </>
           }
@@ -48,7 +48,7 @@ export default function AboutPage() {
 
           <div className="mt-14 border-2 border-ink/30 bg-paper p-8 shadow-[3px_3px_0_0_rgba(22,19,14,0.14)]">
             <div className="flex items-start gap-4">
-              <Compass className="mt-1 size-6 shrink-0 text-amber" />
+              <Compass className="mt-1 size-6 shrink-0 text-amber-deep" />
               <div>
                 <h2 className="font-display text-2xl uppercase tracking-tight">
                   Never start at zero.

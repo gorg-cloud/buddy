@@ -17,9 +17,11 @@
   --card-foreground: #16130e;
   --popover: #f8f5ec;
   --popover-foreground: #16130e;
-  /* amber — the flip-board voice */
+  /* amber — the flip-board voice (glows on dark) */
   --primary: #f2a516;
   --primary-foreground: #16130e;
+  /* burnt amber — the same hue, inked onto paper */
+  --amber-deep: #9c5a00;
   /* ink — the machines */
   --secondary: #16130e;
   --secondary-foreground: #f8f5ec;
@@ -70,6 +72,7 @@
   --color-amber: #f2a516;
   --color-signal: #0e7a45;
   --color-alarm: #c43b2c;
+  --color-amber-deep: #9c5a00;
   --font-sans: var(--font-public), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-anton), "Arial Narrow", ui-sans-serif, sans-serif;
   --font-mono: var(--font-space-mono), ui-monospace, SFMono-Regular, monospace;
@@ -151,6 +154,22 @@
   color: color-mix(in srgb, var(--ink) 75%, transparent);
   padding: 2px 8px;
   transform: rotate(-3deg);
+}
+
+/* Entrance — one quiet, orchestrated arrival on page load */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter {
+  animation: page-enter 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* Scrolling terminal ticker */
@@ -278,6 +297,9 @@
     animation: none;
   }
   .pulse-soft {
+    animation: none;
+  }
+  .page-enter {
     animation: none;
   }
   * {

@@ -116,7 +116,7 @@ export default function LoginPage() {
               </Button>
               <p className="text-center text-xs text-muted-foreground">
                 New here?{" "}
-                <Link href="/signup" className="text-primary hover:underline">
+                <Link href="/signup" className="text-amber-deep hover:underline">
                   Get a buddy
                 </Link>
               </p>
