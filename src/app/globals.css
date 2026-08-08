@@ -1,0 +1,191 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/*
+ * BUDDY — design system
+ * Theme: airports, arrivals, landing. Night-ink terminals, amber departure
+ * boards, one hopeful sky-blue accent. Dark-first, always.
+ */
+
+:root {
+  /* night ink — pre-dawn airport */
+  --background: hsl(220 49% 8%);
+  --foreground: hsl(40 45% 94%);
+  --card: hsl(220 42% 11%);
+  --card-foreground: hsl(40 45% 94%);
+  --popover: hsl(220 46% 10%);
+  --popover-foreground: hsl(40 45% 94%);
+  /* departure-board amber — the accent */
+  --primary: hsl(36 100% 65%);
+  --primary-foreground: hsl(220 49% 8%);
+  --secondary: hsl(220 35% 15%);
+  --secondary-foreground: hsl(40 40% 90%);
+  --muted: hsl(220 30% 14%);
+  --muted-foreground: hsl(217 20% 65%);
+  /* hopeful sky */
+  --accent: hsl(199 95% 74%);
+  --accent-foreground: hsl(220 49% 8%);
+  --destructive: hsl(0 72% 55%);
+  --destructive-foreground: hsl(40 45% 94%);
+  /* boarding-green for "FOUND" status */
+  --success: hsl(152 62% 45%);
+  --success-foreground: hsl(220 49% 8%);
+  --border: hsl(220 30% 18%);
+  --input: hsl(220 30% 20%);
+  --ring: hsl(36 100% 65%);
+  --radius: 0.75rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-bricolage), var(--font-archivo), ui-sans-serif,
+    sans-serif;
+  --font-mono: var(--font-space-mono), ui-monospace, SFMono-Regular, monospace;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+}
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+}
+
+/* ---- Buddy signature pieces ---- */
+
+/* Departure-board text treatment */
+.board {
+  font-family: var(--font-space-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Split-flap flip */
+@keyframes flap {
+  0% {
+    transform: rotateX(0deg);
+    opacity: 1;
+  }
+  40% {
+    transform: rotateX(-88deg);
+    opacity: 0.4;
+  }
+  60% {
+    transform: rotateX(88deg);
+    opacity: 0.4;
+  }
+  100% {
+    transform: rotateX(0deg);
+    opacity: 1;
+  }
+}
+
+.flap-cell {
+  display: inline-block;
+  transform-origin: 50% 50%;
+  animation: flap 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flap-cell {
+    animation: none;
+  }
+  * {
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Amber glow behind the hero board */
+.glow-amber {
+  background:
+    radial-gradient(
+      ellipse 60% 50% at 50% 45%,
+      hsl(36 100% 65% / 0.14),
+      transparent 70%
+    );
+}
+
+/* Subtle terminal grid backdrop */
+.terminal-grid {
+  background-image:
+    linear-gradient(hsl(220 30% 18% / 0.35) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(220 30% 18% / 0.35) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(
+    ellipse 70% 60% at 50% 40%,
+    black 30%,
+    transparent 75%
+  );
+}
+
+/* Slow pulse for "waiting for buddy" status */
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.pulse-soft {
+  animation: pulse-soft 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-soft {
+    animation: none;
+  }
+}
