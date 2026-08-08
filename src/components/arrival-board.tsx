@@ -8,6 +8,24 @@ import { cn } from "@/lib/utils";
 const VISIBLE = 3;
 
 /**
+ * A rotating window of distinct arrivals — like a real split-flap board,
+ * one row per flight. With fewer than VISIBLE flights on the board, the
+ * window simply shows the ones that exist instead of echoing the same
+ * flight across multiple rows.
+ */
+function windowed(arrivals: Arrival[], offset: number): Arrival[] {
+  const out: Arrival[] = [];
+  const seen = new Set<string>();
+  for (let i = 0; i < VISIBLE && arrivals.length > 0; i++) {
+    const a = arrivals[(offset + i) % arrivals.length];
+    if (seen.has(a.id)) break;
+    seen.add(a.id);
+    out.push(a);
+  }
+  return out;
+}
+
+/**
  * One amber character cell that flips like a real split-flap: the old top
  * half folds away, the new bottom half swings up. Falls back to a static
  * cell when the value didn't change or motion is reduced.
@@ -105,25 +123,14 @@ export function ArrivalBoard() {
   useEffect(() => {
     if (arrivals.length === 0) return;
     const id = setInterval(() => {
-      setPrev(
-        Array.from(
-          { length: VISIBLE },
-          (_, i) => arrivals[(tickRef.current + i) % arrivals.length]
-        )
-      );
+      setPrev(windowed(arrivals, tickRef.current));
       tickRef.current += 1;
       setTick(tickRef.current);
     }, 3400);
     return () => clearInterval(id);
   }, [arrivals]);
 
-  const rows =
-    arrivals.length === 0
-      ? []
-      : Array.from(
-          { length: VISIBLE },
-          (_, i) => arrivals[(tick + i) % arrivals.length]
-        );
+  const rows = windowed(arrivals, tick);
 
   return (
     <div className="relative">
