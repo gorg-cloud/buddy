@@ -35,7 +35,7 @@ export default function MatchesPage() {
           title="Someone is already waiting."
           lede={
             buddy
-              ? `Matched by destination and age: ${buddy.name}, at ${
+              ? `Matched by school and country: ${buddy.name}, at ${
                   buddy.school || "their school"
                 } in ${buddy.to || "your destination"}.`
               : "We're still matching you — check back soon."

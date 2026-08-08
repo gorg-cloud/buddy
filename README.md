@@ -59,8 +59,9 @@ coordinates from the ISO dataset, browser-geolocation "Find me").
 - **Missions** — toggling a mission done persists to the database.
 
 **How matching works:** finish onboarding → your profile is saved → the
-matching engine pairs you with the buddy in your destination country
-closest to your age → a match + starter missions are created automatically.
+matching engine pairs you with a buddy in your destination country —
+same school first, then closest age → a match + starter missions are
+created automatically.
 No matches yet? You'll see the waiting state and get matched the moment a
 buddy signs up there.
 

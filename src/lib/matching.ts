@@ -2,12 +2,13 @@ import { createSupabaseAdmin, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 /**
- * The Chain's matching rules (MVP):
+ * The Chain's matching rules:
  * 1. You must have a profile (complete onboarding first).
  * 2. Existing active matches are returned, never duplicated.
- * 3. Candidates: profiles with role 'buddy' living in your destination
- *    country, excluding yourself.
- * 4. The buddy closest to your age wins.
+ * 3. Candidates: profiles with role 'buddy' in your destination country,
+ *    excluding yourself.
+ * 4. Same school first — a buddy at your exact new school wins. Then the
+ *    closest age. Country is the boundary, school is the preference.
  * 5. On a new match, starter missions are created automatically.
  */
 
@@ -65,7 +66,8 @@ export async function findOrCreateMatch(userId: string): Promise<MatchResult> {
   }
   const admin = createSupabaseAdmin();
 
-  // 4. Buddies in my destination country, closest age first
+  // 4. Buddies in my destination country. Same school wins; ties break
+  //    by closest age.
   const { data: candidates } = await admin
     .from("profiles")
     .select("*")
@@ -78,11 +80,17 @@ export async function findOrCreateMatch(userId: string): Promise<MatchResult> {
     return { real: true, me, buddy: null, missions: [] };
   }
 
-  const buddy = [...candidates].sort((a, b) => {
-    const da = Math.abs((a.age ?? 99) - (me.age ?? 99));
-    const db = Math.abs((b.age ?? 99) - (me.age ?? 99));
-    return da - db;
-  })[0];
+  const mySchool = String(me.school ?? "").trim().toLowerCase();
+  const score = (b: Record<string, unknown>) => {
+    const sameSchool =
+      mySchool !== "" &&
+      String(b.school ?? "").trim().toLowerCase() === mySchool
+        ? 0
+        : 1;
+    const ageDiff = Math.abs((b.age ?? 99) - (me.age ?? 99));
+    return sameSchool * 1_000_000 + ageDiff;
+  };
+  const buddy = [...candidates].sort((a, b) => score(a) - score(b))[0];
 
   // 5. Create the match + starter missions
   const { data: match } = await admin
