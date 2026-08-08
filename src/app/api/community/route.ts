@@ -34,7 +34,8 @@ export async function GET(req: Request) {
     .order("created_at", { ascending: true })
     .limit(200);
 
-  // Optional — lets the client know which bubbles are theirs.
+  // Optional — lets the client know who's signed in and which bubbles
+  // are theirs.
   let meId: string | null = null;
   const supabase = await createSupabaseServerClient();
   const {
@@ -45,6 +46,7 @@ export async function GET(req: Request) {
   return NextResponse.json({
     real: true,
     room,
+    signedIn: Boolean(user),
     meId,
     messages: data ?? [],
     error: error ? String(error.message) : null,
