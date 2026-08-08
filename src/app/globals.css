@@ -3,41 +3,42 @@
 
 /*
  * BUDDY — design system
- * Theme: a small airport terminal at dawn. Warm concrete walls, paper
- * tickets, matte-black machines. Everything is a physical artifact from
- * the world of departures and arrivals — never a glassy dark-mode app.
+ * Theme: a small airport terminal at night. Cool dusk concrete walls,
+ * blue-white ticket stock, blue-black machines, and the amber flip board
+ * glowing against it all. Everything is a physical artifact from the
+ * world of departures and arrivals — never a glassy dark-mode app.
  */
 
 :root {
-  /* concrete — aged terminal walls and floors */
-  --background: #ddd8cc;
-  --foreground: #16130e;
-  /* paper — ticket stock */
-  --card: #f8f5ec;
-  --card-foreground: #16130e;
-  --popover: #f8f5ec;
-  --popover-foreground: #16130e;
+  /* dusk concrete — terminal walls under night lighting */
+  --background: #c9cfda;
+  --foreground: #131a26;
+  /* paper — cool ticket stock */
+  --card: #f4f6fa;
+  --card-foreground: #131a26;
+  --popover: #f4f6fa;
+  --popover-foreground: #131a26;
   /* amber — the flip-board voice (glows on dark) */
   --primary: #f2a516;
-  --primary-foreground: #16130e;
+  --primary-foreground: #131a26;
   /* burnt amber — the same hue, inked onto paper */
   --amber-deep: #9c5a00;
   /* ink — the machines */
-  --secondary: #16130e;
-  --secondary-foreground: #f8f5ec;
-  --muted: #e6e1d4;
-  --muted-foreground: #5c564b;
+  --secondary: #131a26;
+  --secondary-foreground: #f4f6fa;
+  --muted: #e3e7ef;
+  --muted-foreground: #566079;
   /* signal green — FOUND / GO */
   --accent: #0e7a45;
-  --accent-foreground: #f8f5ec;
+  --accent-foreground: #f4f6fa;
   /* alarm red — WAITING / attention */
   --destructive: #c43b2c;
-  --destructive-foreground: #f8f5ec;
+  --destructive-foreground: #f4f6fa;
   --success: #0e7a45;
-  --success-foreground: #f8f5ec;
+  --success-foreground: #f4f6fa;
   /* hairlines */
-  --border: #c7c1b2;
-  --input: #b9b2a0;
+  --border: #b7bfcc;
+  --input: #a8b1c0;
   --ring: #f2a516;
   /* sharp — physical objects, not UI */
   --radius: 0px;
@@ -66,9 +67,9 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   /* named artifacts */
-  --color-ink: #16130e;
-  --color-paper: #f8f5ec;
-  --color-concrete: #ddd8cc;
+  --color-ink: #131a26;
+  --color-paper: #f4f6fa;
+  --color-concrete: #c9cfda;
   --color-amber: #f2a516;
   --color-signal: #0e7a45;
   --color-alarm: #c43b2c;
@@ -266,7 +267,7 @@
   width: 36px;
   height: 36px;
   border: 2px solid var(--pin-color);
-  background: #0d0b08;
+  background: #10151d;
   box-shadow:
     0 0 0 1px rgba(0, 0, 0, 0.5),
     0 0 12px rgba(0, 0, 0, 0.65);
@@ -306,7 +307,7 @@
 
 .leaflet-container {
   font-family: var(--font-space-mono);
-  background: #0d0b08;
+  background: #10151d;
 }
 
 .leaflet-popup-content-wrapper {

@@ -28,9 +28,6 @@ const chain = [
   },
 ];
 
-const tapeMessage =
-  "NO LIKES · NO FOLLOWERS · NO ALGORITHMS — JUST ONE PERSON";
-
 const profileQuestions = [
   "What's the scariest part of your move?",
   "One thing you want to do at your new school?",
@@ -86,11 +83,7 @@ export default function Home() {
           <div className="glow-amber absolute inset-0" aria-hidden />
           <div className="relative mx-auto grid w-full max-w-6xl gap-12 px-4 pt-16 pb-20 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-16 lg:pt-24 lg:pb-28">
             <div className="page-enter">
-              <p className="board inline-flex items-center gap-2 border-2 border-ink/25 bg-paper/70 px-2.5 py-1 text-[11px] tracking-[0.22em] text-ink/70">
-                <span className="size-1.5 bg-amber" aria-hidden />
-                For kids who move · 14+
-              </p>
-              <h1 className="mt-6 font-display text-5xl uppercase leading-[0.95] tracking-tight text-ink sm:text-7xl lg:text-[5.5rem]">
+              <h1 className="font-display text-5xl uppercase leading-[0.95] tracking-tight text-ink sm:text-7xl lg:text-[5.5rem]">
                 Never start
                 <br />
                 at <span className="text-amber-deep">zero</span>.
@@ -121,27 +114,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-
-        {/* TICKER TAPE */}
-        <div
-          className="overflow-hidden border-y-2 border-ink bg-ink py-2.5"
-          aria-hidden
-        >
-          <div className="tape-track board text-xs tracking-[0.3em] text-amber">
-            {[0, 1, 2, 3].map((i) => (
-              <span key={i} className="flex shrink-0 items-center">
-                <span className="px-6">{tapeMessage}</span>
-                <span className="mx-1 inline-block size-2 bg-amber/70" />
-              </span>
-            ))}
-            {[0, 1, 2, 3].map((i) => (
-              <span key={`b-${i}`} className="flex shrink-0 items-center">
-                <span className="px-6">{tapeMessage}</span>
-                <span className="mx-1 inline-block size-2 bg-amber/70" />
-              </span>
-            ))}
-          </div>
-        </div>
 
         {/* THE CHAIN */}
         <section className="relative">

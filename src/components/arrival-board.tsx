@@ -127,10 +127,10 @@ export function ArrivalBoard() {
 
   return (
     <div className="relative">
-      <div className="rounded-[4px] border-2 border-ink/70 bg-[#0d0b08] p-1.5 shadow-[8px_8px_0_0_rgba(22,19,14,0.22)] sm:p-2">
-        {/* brushed metal frame */}
-        <div className="rounded-[2px] bg-gradient-to-b from-[#4a443a] via-[#262219] to-[#17140f] p-[3px]">
-          <div className="rounded-[1px] bg-[#0d0b08]">
+      <div className="rounded-[4px] border-2 border-ink/70 bg-[#10151d] p-1.5 shadow-[8px_8px_0_0_rgba(19,26,38,0.28)] sm:p-2">
+        {/* brushed metal frame — night lighting */}
+        <div className="rounded-[2px] bg-gradient-to-b from-[#3f4651] via-[#20242e] to-[#12161d] p-[3px]">
+          <div className="rounded-[1px] bg-[#10151d]">
             {/* header */}
             <div className="flex items-center justify-between border-b border-amber/15 px-3 py-2.5 sm:px-4">
               <span className="board flex items-center gap-2 text-[11px] tracking-[0.25em] text-amber">
