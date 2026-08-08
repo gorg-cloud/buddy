@@ -87,7 +87,7 @@ export async function findOrCreateMatch(userId: string): Promise<MatchResult> {
       String(b.school ?? "").trim().toLowerCase() === mySchool
         ? 0
         : 1;
-    const ageDiff = Math.abs((b.age ?? 99) - (me.age ?? 99));
+    const ageDiff = Math.abs(Number(b.age ?? 99) - Number(me.age ?? 99));
     return sameSchool * 1_000_000 + ageDiff;
   };
   const buddy = [...candidates].sort((a, b) => score(a) - score(b))[0];
