@@ -1,7 +1,7 @@
 import { ArrowRight, Handshake } from "lucide-react";
 
 import { Barcode } from "@/components/barcode";
-import type { BuddyProfile } from "@/lib/demo-data";
+import type { BuddyProfile } from "@/lib/types";
 
 function initials(name: string) {
   return name

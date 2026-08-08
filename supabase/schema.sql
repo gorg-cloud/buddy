@@ -18,7 +18,6 @@ create table public.profiles (
   move_date date,
   answers jsonb default '{}'::jsonb,   -- questions-first profile
   languages text[] default '{}',
-  emoji text default '🧭',
   carried int default 0,                -- the Chain: kids you've helped
   created_at timestamptz default now()
 );
@@ -61,6 +60,19 @@ create table public.anchors (
   answers jsonb default '{}'::jsonb
 );
 
+-- Arrivals: the public landing board. Anonymized on purpose — only city
+-- pairs and a status, never names or schools. A mover's flight is WAITING
+-- until the matching engine pairs them, then it flips to FOUND.
+create table public.arrivals (
+  id uuid default gen_random_uuid() primary key,
+  profile_id uuid references public.profiles(id) on delete cascade unique,
+  flight text not null,
+  from_city text,
+  to_city text,
+  status text not null default 'waiting' check (status in ('waiting', 'found')),
+  created_at timestamptz default now()
+);
+
 -- Safety reports.
 create table public.reports (
   id uuid default gen_random_uuid() primary key,
@@ -73,7 +85,8 @@ create table public.reports (
 -- ============================================================
 -- Row Level Security
 -- Principle: nothing is public. A profile is visible only to
--- its owner and to people matched with them.
+-- its owner and to people matched with them. The one exception
+-- is the arrivals board, which is anonymized by design.
 -- ============================================================
 
 alter table public.profiles enable row level security;
@@ -81,6 +94,7 @@ alter table public.matches enable row level security;
 alter table public.missions enable row level security;
 alter table public.messages enable row level security;
 alter table public.anchors enable row level security;
+alter table public.arrivals enable row level security;
 alter table public.reports enable row level security;
 
 -- Helper: the set of profile ids a user is matched with.
@@ -93,35 +107,67 @@ returns setof uuid language sql stable as $$
 $$;
 
 -- Profiles: owner sees own; matched people see each other.
+-- WITH CHECK keeps a user from reassigning their row to someone else's id.
 create policy "own profile" on public.profiles
-  for all using (auth.uid() = id);
+  for all to authenticated
+  using (auth.uid() = id)
+  with check (auth.uid() = id);
 
 create policy "matched profiles" on public.profiles
-  for select using (id in (select public.matched_with(auth.uid())));
+  for select to authenticated
+  using (id in (select public.matched_with(auth.uid())));
 
 -- Matches: only the two people in the match.
 create policy "own matches" on public.matches
-  for all using (auth.uid() in (mover, buddy));
+  for all to authenticated
+  using (auth.uid() in (mover, buddy))
+  with check (auth.uid() in (mover, buddy));
 
 -- Missions: visible to the two people in the match.
 create policy "match missions" on public.missions
-  for all using (
+  for all to authenticated
+  using (
+    match_id in (select id from public.matches where auth.uid() in (mover, buddy))
+  )
+  with check (
     match_id in (select id from public.matches where auth.uid() in (mover, buddy))
   );
 
 -- Messages: visible to the two people in the match.
 create policy "match messages" on public.messages
-  for all using (
+  for all to authenticated
+  using (
+    match_id in (select id from public.matches where auth.uid() in (mover, buddy))
+  )
+  with check (
     match_id in (select id from public.matches where auth.uid() in (mover, buddy))
   );
 
--- Anchors: anyone can ask anchors questions (answers only, no contact).
+-- Anchors: anyone can read anchor answers (answers only, no contact).
 create policy "anchors public answers" on public.anchors
-  for select using (true);
+  for select to anon, authenticated using (true);
+
+-- Arrivals: the board is public, but it carries no personal data.
+create policy "arrivals public board" on public.arrivals
+  for select to anon, authenticated using (true);
 
 -- Reports: reporters insert, nobody reads except service role.
 create policy "report insert" on public.reports
-  for insert with check (auth.uid() = reporter);
+  for insert to authenticated with check (auth.uid() = reporter);
 
 create policy "report owner" on public.reports
-  for select using (auth.uid() = reporter);
+  for select to authenticated using (auth.uid() = reporter);
+
+-- ============================================================
+-- Data API access grants
+-- Tables created via the SQL editor are not automatically exposed to the
+-- PostgREST Data API — grant explicitly. RLS still gates every row.
+-- ============================================================
+
+grant usage on schema public to anon, authenticated;
+
+grant select on public.arrivals, public.anchors to anon;
+
+grant all on public.profiles, public.matches, public.missions,
+  public.messages, public.anchors, public.arrivals, public.reports
+  to authenticated;

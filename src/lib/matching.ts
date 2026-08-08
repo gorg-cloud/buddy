@@ -49,6 +49,13 @@ export async function findOrCreateMatch(userId: string): Promise<MatchResult> {
       .select("*")
       .eq("match_id", existing.id)
       .order("created_at");
+    // The board: this mover's flight is now FOUND.
+    if (hasServiceRoleKey()) {
+      await createSupabaseAdmin()
+        .from("arrivals")
+        .update({ status: "found" })
+        .eq("profile_id", userId);
+    }
     return { real: true, me, buddy, missions: missions ?? [] };
   }
 
@@ -85,6 +92,12 @@ export async function findOrCreateMatch(userId: string): Promise<MatchResult> {
     .single();
 
   if (match) {
+    // The board: this mover's flight is now FOUND.
+    await admin
+      .from("arrivals")
+      .update({ status: "found" })
+      .eq("profile_id", userId);
+
     const starters = [
       {
         title: "Send a first hello",

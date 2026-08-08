@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/logo";
-import { SESSION_KEY, isSupabaseConfigured, type Session } from "@/lib/auth";
+import { SESSION_KEY, isSupabaseConfigured } from "@/lib/auth";
 import { getSupabase } from "@/lib/supabase/client";
 
 export default function LoginPage() {
@@ -30,29 +30,29 @@ export default function LoginPage() {
     e.preventDefault();
     setBusy(true);
 
-    if (isSupabaseConfigured()) {
-      const supabase = getSupabase();
-      const { error } = await supabase!.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) {
-        toast.error(error.message);
-        setBusy(false);
-        return;
-      }
-      router.push("/dashboard");
+    if (!isSupabaseConfigured()) {
+      toast.error(
+        "Supabase isn't connected yet — add your keys to .env.local and restart"
+      );
+      setBusy(false);
       return;
     }
 
-    // Demo mode — drop straight in
-    const session: Session = {
-      name: "You",
+    const supabase = getSupabase();
+    const { data, error } = await supabase!.auth.signInWithPassword({
       email,
-      role: "mover",
-      onboarded: true,
-    };
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+      password,
+    });
+    if (error) {
+      toast.error(error.message);
+      setBusy(false);
+      return;
+    }
+    const name = data.user?.user_metadata?.name ?? "You";
+    localStorage.setItem(
+      SESSION_KEY,
+      JSON.stringify({ name, email, role: "mover", onboarded: true })
+    );
     toast.success("Welcome back");
     router.push("/dashboard");
   }
@@ -88,6 +88,12 @@ export default function LoginPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+              {!isSupabaseConfigured() && (
+                <p className="board border-2 border-amber/40 bg-amber/10 px-3 py-2 text-[10px] tracking-[0.15em] text-amber-deep">
+                  CONNECT SUPABASE TO ENABLE REAL ACCOUNTS — KEYS GO IN
+                  .ENV.LOCAL
+                </p>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input

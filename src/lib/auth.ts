@@ -1,10 +1,9 @@
 /**
- * Auth + demo-mode helpers.
+ * Supabase connection helpers.
  *
- * Until Supabase keys are added to `.env.local`, Buddy runs in demo mode:
- * sign-up/login store a lightweight session in localStorage and every page
- * renders with sample data. Once keys are present, the real Supabase client
- * takes over.
+ * Buddy has no demo mode. Without keys in `.env.local` the app shows honest
+ * empty states and guides you to connect; the moment the keys are present,
+ * signup/login/onboarding talk to the real database.
  */
 
 export function isSupabaseConfigured() {
@@ -14,7 +13,11 @@ export function isSupabaseConfigured() {
   );
 }
 
+/** Name cache for the dashboard greeting — never an auth mechanism. */
 export const SESSION_KEY = "buddy:session";
+
+/** Role picked at signup, stored with the profile row. */
+export const ROLE_KEY = "buddy:role";
 
 export type Session = {
   name: string;

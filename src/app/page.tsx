@@ -3,12 +3,10 @@ import { ArrowRight } from "lucide-react";
 
 import { ArrivalBoard } from "@/components/arrival-board";
 import { Barcode } from "@/components/barcode";
-import { ProfileCard } from "@/components/profile-card";
 import { Signage } from "@/components/signage";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
-import { profiles } from "@/lib/demo-data";
 
 const chain = [
   {
@@ -30,6 +28,13 @@ const chain = [
 
 const tapeMessage =
   "NO LIKES · NO FOLLOWERS · NO ALGORITHMS — JUST ONE PERSON";
+
+const profileQuestions = [
+  "What's the scariest part of your move?",
+  "One thing you want to do at your new school?",
+  "What do you do when you feel alone?",
+  "What's the first thing you'd show a new kid?",
+];
 
 function ChainStub({
   no,
@@ -182,9 +187,43 @@ export default function Home() {
                 Profiles are visible only to your matches.
               </div>
             </div>
-            <div className="grid gap-6 sm:grid-cols-2">
-              <ProfileCard profile={profiles[0]} compact />
-              <ProfileCard profile={profiles[1]} compact />
+            <div className="relative border-2 border-ink/30 bg-paper shadow-[3px_3px_0_0_rgba(22,19,14,0.14)]">
+              <div className="perf border-b border-dashed border-ink/30" aria-hidden />
+              <div className="flex items-center justify-between gap-3 p-5">
+                <div>
+                  <p className="board text-[10px] tracking-[0.2em] text-amber-deep">
+                    PROFILE — QUESTIONS FIRST
+                  </p>
+                  <p className="mt-1 font-display text-xl uppercase text-ink">
+                    The whole profile is four questions
+                  </p>
+                </div>
+                <span className="stamp shrink-0">private</span>
+              </div>
+              <div className="space-y-3 px-5 pb-5">
+                {profileQuestions.map((q, i) => (
+                  <div key={q} className="border border-ink/20 bg-muted/50 p-3">
+                    <p className="board text-[10px] font-bold tracking-[0.18em] text-amber-deep">
+                      Q{i + 1}
+                    </p>
+                    <p className="mt-1 text-sm leading-relaxed text-ink/85">
+                      {q}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center justify-between border-t-2 border-ink bg-ink px-5 py-2">
+                <span className="board text-[9px] tracking-[0.25em] text-paper/60">
+                  PASSENGER · YOU
+                </span>
+                <span className="board text-[9px] tracking-[0.25em] text-paper/60">
+                  SEAT 01A
+                </span>
+              </div>
+              <p className="board border-t border-dashed border-ink/25 px-5 py-3 text-[10px] tracking-[0.15em] text-ink/50">
+                NO FABRICATED PROFILES HERE — REAL KIDS&apos; ANSWERS LAND ON
+                THIS TICKET THE MOMENT THEY SIGN UP.
+              </p>
             </div>
           </div>
         </section>

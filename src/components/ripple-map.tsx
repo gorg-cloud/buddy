@@ -1,28 +1,23 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Anchor, Compass, Users } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
+import { Anchor, Compass, Crosshair, Users } from "lucide-react";
+import { toast } from "sonner";
 
+import { CountryPicker } from "@/components/country-picker";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { anchors, profiles } from "@/lib/demo-data";
+import { Skeleton } from "@/components/ui/skeleton";
+import { isSupabaseConfigured } from "@/lib/auth";
+import type { MapPerson } from "@/lib/types";
 
-/** Deterministic pseudo-random from a string — stable across renders. */
-function hash(str: string) {
-  let h = 2166136261;
-  for (let i = 0; i < str.length; i++) {
-    h ^= str.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return Math.abs(h);
-}
+// Leaflet touches `window` at import time — never server-render it.
+const MapView = dynamic(
+  () => import("@/components/map-view").then((m) => m.MapView),
+  { ssr: false }
+);
 
 function initials(name: string) {
   return name
@@ -33,255 +28,206 @@ function initials(name: string) {
     .join("");
 }
 
-const bandByCountry: Record<string, number> = {
-  Portugal: 1,
-  Canada: 2,
-  Netherlands: 1,
-  Australia: 3,
-  "New Zealand": 3,
-};
-
-const bands = [
-  { r: 70, label: "near — same region" },
-  { r: 130, label: "one ocean away" },
-  { r: 190, label: "the other side of the world" },
-];
-
-const ALL = "all";
+interface MapData {
+  anchors: MapPerson[];
+  peers: MapPerson[];
+}
 
 export function RippleMap() {
-  const [country, setCountry] = useState(ALL);
+  const [data, setData] = useState<MapData>({ anchors: [], peers: [] });
+  const [loading, setLoading] = useState(true);
+  const [country, setCountry] = useState("");
+  const [focus, setFocus] = useState<{ lat: number; lng: number } | null>(null);
+
+  // Real anchors + peers from the database, with real coordinates.
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/map")
+      .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
+      .then((d) => {
+        if (cancelled) return;
+        setData({
+          anchors: Array.isArray(d.anchors) ? d.anchors : [],
+          peers: Array.isArray(d.peers) ? d.peers : [],
+        });
+        setLoading(false);
+      })
+      .catch(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const people = useMemo(() => {
-    const peers = profiles
-      .filter((p) => p.role !== "anchor")
-      .map((p) => ({
-        kind: "peer" as const,
-        id: p.id,
-        name: p.handle,
-        country: p.to,
-        role: "moving there" as const,
-      }));
-    const anchorsList = anchors.map((a) => ({
-      kind: "anchor" as const,
-      id: a.id,
-      name: a.name,
-      country: a.country,
-      role: "anchor — experienced" as const,
-    }));
-    const all = [...peers, ...anchorsList];
-    return country === ALL ? all : all.filter((p) => p.country === country);
-  }, [country]);
+    const all = [...data.anchors, ...data.peers];
+    return country ? all.filter((p) => p.country === country) : all;
+  }, [data, country]);
 
-  const pins = useMemo(() => {
-    return people.map((p, i) => {
-      const band = bandByCountry[p.country] ?? 2;
-      const angle = (hash(p.id) % 3600) / 10; // 0–360
-      const jitter = (hash(p.id + "j") % 30) - 15;
-      const r = bands[band - 1].r + jitter;
-      const rad = (angle * Math.PI) / 180;
-      return {
-        ...p,
-        x: 200 + r * Math.cos(rad),
-        y: 200 + r * Math.sin(rad),
-        band,
-      };
-    });
-  }, [people]);
-
-  const countries = useMemo(() => {
-    const set = new Set<string>([
-      ...anchors.map((a) => a.country),
-      ...profiles.filter((p) => p.role !== "anchor").map((p) => p.to),
-    ]);
-    return [ALL, ...set];
+  const findMe = useCallback(() => {
+    if (typeof window === "undefined" || !navigator.geolocation) {
+      toast.error("Your browser doesn't support location");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`
+          );
+          const geo = (await res.json()) as {
+            address?: { country?: string };
+          };
+          const place = geo.address?.country;
+          if (place) setCountry(place);
+          setFocus({ lat: latitude, lng: longitude });
+          toast.success(place ? `You're in ${place}` : "Found you on the map");
+        } catch {
+          setFocus({ lat: latitude, lng: longitude });
+        }
+      },
+      () => toast.error("Couldn't get your location"),
+      { enableHighAccuracy: false, timeout: 8000 }
+    );
   }, []);
+
+  const inCountry = useMemo(
+    () => [...data.anchors, ...data.peers].some((p) => p.country === country),
+    [data, country]
+  );
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-      {/* The ripple visual — a paper terminal map */}
+      {/* The real map */}
       <div className="border-2 border-ink/30 bg-paper p-4 shadow-[3px_3px_0_0_rgba(22,19,14,0.14)]">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <p className="board text-[11px] tracking-[0.2em] text-ink/60">
-            YOUR WORLD — {people.length} PEOPLE AROUND YOU
+            {loading
+              ? "READING THE WORLD…"
+              : `THE WORLD — ${people.length} ${
+                  people.length === 1 ? "PERSON" : "PEOPLE"
+                } ON THIS VIEW`}
           </p>
           <div className="flex items-center gap-3 text-[11px]">
             <span className="board inline-flex items-center gap-1.5 text-ink/60">
               <span className="size-2 bg-amber" /> anchor
             </span>
             <span className="board inline-flex items-center gap-1.5 text-ink/60">
-              <span className="size-2 bg-signal" /> peer
+              <span className="size-2 bg-sky" /> peer
             </span>
           </div>
         </div>
 
-        <svg
-          viewBox="0 0 400 400"
-          className="mx-auto w-full max-w-md"
-          role="img"
-          aria-label="Map of people around you"
-        >
-          {/* paper texture rings */}
-          {bands.map((b) => (
-            <circle
-              key={b.r}
-              cx="200"
-              cy="200"
-              r={b.r}
-              fill="none"
-              stroke="var(--ink)"
-              strokeOpacity="0.18"
-              strokeWidth="1.5"
-              strokeDasharray="4 6"
-            />
-          ))}
-          {bands.map((b) => (
-            <text
-              key={b.r}
-              x="200"
-              y={200 - b.r - 10}
-              textAnchor="middle"
-              fontFamily="var(--font-space-mono)"
-              fontSize="8"
-              letterSpacing="2"
-              fill="var(--ink)"
-              opacity="0.5"
-            >
-              {b.label}
-            </text>
-          ))}
-
-          {/* compass */}
-          <g transform="translate(352, 52)">
-            <circle r="14" fill="none" stroke="var(--ink)" strokeOpacity="0.4" />
-            <path d="M0 -9 L3 3 L0 0 L-3 3 Z" fill="var(--ink)" opacity="0.6" />
-            <text
-              y="-16"
-              textAnchor="middle"
-              fontFamily="var(--font-space-mono)"
-              fontSize="7"
-              letterSpacing="1"
-              fill="var(--ink)"
-              opacity="0.5"
-            >
-              N
-            </text>
-          </g>
-
-          {/* center — you */}
-          <circle
-            cx="200"
-            cy="200"
-            r="18"
-            fill="var(--amber)"
-            opacity="0.18"
-          />
-          <circle cx="200" cy="200" r="7" fill="var(--amber)" />
-          <text
-            x="200"
-            y="234"
-            textAnchor="middle"
-            fontFamily="var(--font-space-mono)"
-            fontSize="10"
-            fontWeight="700"
-            letterSpacing="2"
-            fill="var(--ink)"
-          >
-            YOU
-          </text>
-
-          {pins.map((p) => (
-            <g key={p.id}>
-              <circle
-                cx={p.x}
-                cy={p.y}
-                r={p.kind === "anchor" ? 8 : 6}
-                fill={p.kind === "anchor" ? "var(--amber)" : "var(--signal)"}
-              />
-              <circle
-                cx={p.x}
-                cy={p.y}
-                r={p.kind === "anchor" ? 13 : 10}
-                fill="none"
-                stroke={p.kind === "anchor" ? "var(--amber)" : "var(--signal)"}
-                strokeWidth="1"
-                opacity="0.4"
-              />
-              <text
-                x={p.x}
-                y={p.y + 24}
-                textAnchor="middle"
-                fontFamily="var(--font-space-mono)"
-                fontSize="8"
-                letterSpacing="1.5"
-                fill="var(--ink)"
-                opacity="0.65"
-              >
-                {initials(p.name)}
-              </text>
-            </g>
-          ))}
-        </svg>
+        <div className="h-[380px] w-full overflow-hidden border-2 border-ink sm:h-[460px]">
+          {loading ? (
+            <div className="flex h-full items-center justify-center bg-ink">
+              <span className="board animate-pulse text-[11px] tracking-[0.3em] text-amber">
+                PLOTTING REAL PLACES…
+              </span>
+            </div>
+          ) : (
+            <MapView people={people} focus={focus} />
+          )}
+        </div>
 
         <p className="board mt-2 text-center text-[10px] tracking-[0.2em] text-alarm">
           ANCHORS ANSWER QUESTIONS. THEY ARE NOT FOR MEETING UP. EVER.
         </p>
       </div>
 
-      {/* List */}
-      <div className="border-2 border-ink/30 bg-paper p-4 shadow-[3px_3px_0_0_rgba(22,19,14,0.14)]">
+      {/* Controls + list */}
+      <div className="flex flex-col border-2 border-ink/30 bg-paper p-4 shadow-[3px_3px_0_0_rgba(22,19,14,0.14)]">
         <div className="flex items-center justify-between gap-2">
           <p className="font-display text-lg uppercase tracking-tight">
             Near you
           </p>
-          <Select value={country} onValueChange={setCountry}>
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="Country" />
-            </SelectTrigger>
-            <SelectContent>
-              {countries.map((c) => (
-                <SelectItem key={c} value={c}>
-                  {c === ALL ? "Everywhere" : c}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={findMe}
+            className="shrink-0"
+          >
+            <Crosshair className="size-3.5" />
+            Find me
+          </Button>
         </div>
 
-        <div className="mt-4 space-y-2">
-          {pins.map((p) => (
-            <div
-              key={p.id}
-              className="flex items-center gap-3 border border-ink/20 bg-muted/40 p-3"
+        <div className="mt-3 space-y-2">
+          <CountryPicker
+            value={country}
+            onValueChange={setCountry}
+            placeholder="Everywhere — pick a country"
+          />
+          {country && (
+            <button
+              type="button"
+              onClick={() => setCountry("")}
+              className="board cursor-pointer text-[10px] tracking-[0.2em] text-amber-deep underline underline-offset-2 hover:text-ink"
             >
-              <span className="board flex size-9 shrink-0 items-center justify-center bg-ink text-xs font-bold text-paper">
-                {initials(p.name)}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-display text-sm uppercase tracking-wide">
-                  {p.name}
-                </p>
-                <p className="board text-[10px] tracking-[0.15em] text-ink/55">
-                  {p.country} · {p.role}
-                </p>
-              </div>
-              <Badge
-                variant={p.kind === "anchor" ? "default" : "sky"}
-                className="shrink-0"
-              >
-                {p.kind === "anchor" ? (
-                  <Anchor className="size-3" />
-                ) : (
-                  <Users className="size-3" />
-                )}
-                {p.kind === "anchor" ? "anchor" : "peer"}
-              </Badge>
+              CLEAR FILTER · SHOW EVERYWHERE
+            </button>
+          )}
+        </div>
+
+        {!isSupabaseConfigured() && (
+          <p className="board mt-3 border-2 border-amber/40 bg-amber/10 px-3 py-2 text-[10px] tracking-[0.15em] text-amber-deep">
+            CONNECT SUPABASE AND REAL ANCHORS + PEERS APPEAR HERE — THE MAP
+            ITSELF IS ALREADY THE REAL WORLD.
+          </p>
+        )}
+
+        <div className="mt-4 flex-1 space-y-2 overflow-y-auto">
+          {loading ? (
+            <div className="space-y-2">
+              <Skeleton className="h-14 w-full" />
+              <Skeleton className="h-14 w-full" />
+              <Skeleton className="h-14 w-full" />
             </div>
-          ))}
-          {pins.length === 0 && (
-            <p className="py-8 text-center text-sm text-muted-foreground">
-              Nobody around you yet. Be the first anchor in this region.
-            </p>
+          ) : people.length === 0 ? (
+            <div className="border border-ink/20 bg-muted/40 p-6 text-center">
+              <p className="board text-[11px] tracking-[0.2em] text-amber-deep">
+                {country ? `NOTHING IN ${country.toUpperCase()} YET` : "NO ONE HERE YET"}
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                {country && !inCountry
+                  ? "Nobody has landed here yet. When a mover or an anchor signs up, they appear on the map."
+                  : "Be the first. The map fills up as kids sign up — every real place, plotted for real."}
+              </p>
+            </div>
+          ) : (
+            people.map((p) => (
+              <div
+                key={p.id}
+                className="flex items-center gap-3 border border-ink/20 bg-muted/40 p-3"
+              >
+                <span className="board flex size-9 shrink-0 items-center justify-center bg-ink text-xs font-bold text-paper">
+                  {initials(p.name)}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-display text-sm uppercase tracking-wide">
+                    {p.name}
+                  </p>
+                  <p className="board text-[10px] tracking-[0.15em] text-ink/55">
+                    {p.city ? `${p.city}, ` : ""}
+                    {p.country} · {p.detail}
+                  </p>
+                </div>
+                <Badge
+                  variant={p.kind === "anchor" ? "default" : "sky"}
+                  className="shrink-0"
+                >
+                  {p.kind === "anchor" ? (
+                    <Anchor className="size-3" />
+                  ) : (
+                    <Users className="size-3" />
+                  )}
+                  {p.kind === "anchor" ? "anchor" : "peer"}
+                </Badge>
+              </div>
+            ))
           )}
         </div>
 

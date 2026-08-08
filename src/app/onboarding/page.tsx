@@ -6,13 +6,14 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
+import { CountryPicker } from "@/components/country-picker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Logo } from "@/components/logo";
-import { SESSION_KEY, isSupabaseConfigured } from "@/lib/auth";
+import { ROLE_KEY, SESSION_KEY, isSupabaseConfigured } from "@/lib/auth";
 
 const questions = [
   {
@@ -37,8 +38,7 @@ const questions = [
   },
 ];
 
-const STEP_LABELS = ["The basics", "Your questions"] as const;
-type Step = (typeof STEP_LABELS)[number];
+type Step = "The basics" | "Your questions";
 
 const stepIndex: Record<Step, number> = { "The basics": 1, "Your questions": 2 };
 
@@ -56,31 +56,40 @@ export default function OnboardingPage() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
   async function save() {
+    if (!isSupabaseConfigured()) {
+      toast.error(
+        "Supabase isn't connected yet — add your keys to .env.local and restart"
+      );
+      return;
+    }
+
+    const role = localStorage.getItem(ROLE_KEY) ?? "mover";
     const session = JSON.parse(localStorage.getItem(SESSION_KEY) || "{}");
     session.onboarded = true;
     session.name = name;
     localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-    localStorage.setItem(
-      "buddy:profile",
-      JSON.stringify({ name, age, from, to, school, country, moveDate, answers })
-    );
 
-    if (isSupabaseConfigured()) {
-      await fetch("/api/profile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          age,
-          from,
-          to,
-          school,
-          country,
-          moveDate,
-          answers,
-          role: session.role ?? "mover",
-        }),
-      });
+    const res = await fetch("/api/profile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name,
+        age,
+        from,
+        to,
+        school,
+        country,
+        moveDate,
+        answers,
+        role,
+      }),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      toast.error(
+        data.error ?? "Couldn't save your profile — are you signed in?"
+      );
+      return;
     }
 
     toast.success("Profile saved — finding your buddy");
@@ -105,11 +114,14 @@ export default function OnboardingPage() {
             <TabsTrigger value="Your questions">Your questions</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="The basics">
-            <form
+          <TabsContent value="The basics">              <form
               className="space-y-5"
               onSubmit={(e) => {
                 e.preventDefault();
+                if (!country) {
+                  toast.error("Pick the country you're moving to");
+                  return;
+                }
                 setStep("Your questions");
               }}
             >
@@ -161,7 +173,7 @@ export default function OnboardingPage() {
                     id="to"
                     value={to}
                     onChange={(e) => setTo(e.target.value)}
-                    placeholder="City, country"
+                    placeholder="City — e.g. Lisbon"
                     required
                   />
                 </div>
@@ -176,14 +188,18 @@ export default function OnboardingPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="country">Country you're moving to</Label>
-                  <Input
+                  <Label htmlFor="country">Country you&apos;re moving to</Label>
+                  <CountryPicker
                     id="country"
                     value={country}
-                    onChange={(e) => setCountry(e.target.value)}
-                    placeholder="Portugal"
-                    required
+                    onValueChange={setCountry}
+                    placeholder="Search 250 real countries…"
                   />
+                  {!country && (
+                    <p className="text-xs text-alarm">
+                      Matching runs on this — every real place is in the list.
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="moveDate">Move date</Label>

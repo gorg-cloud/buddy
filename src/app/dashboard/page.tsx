@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, CalendarClock, Handshake } from "lucide-react";
 
+import { ConnectNotice } from "@/components/connect-notice";
 import { MissionCard } from "@/components/mission-card";
 import { ProfileCard } from "@/components/profile-card";
 import { SiteFooter } from "@/components/site-footer";
@@ -15,25 +16,27 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMatch } from "@/hooks/use-match";
+import { SESSION_KEY } from "@/lib/auth";
+import { useMounted } from "@/lib/use-mounted";
 import { daysUntil } from "@/lib/utils";
 
 export default function DashboardPage() {
   const router = useRouter();
   const { loading, real, me, buddy, missions } = useMatch();
-  const [greeting, setGreeting] = useState("You");
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
 
-  useEffect(() => {
-    setMounted(true);
-    const session = localStorage.getItem("buddy:session");
-    if (session) {
-      try {
-        setGreeting(JSON.parse(session).name || "You");
-      } catch {
-        /* ignore */
+  let greeting = "You";
+  if (mounted) {
+    try {
+      const session = localStorage.getItem(SESSION_KEY);
+      if (session) {
+        const parsed = JSON.parse(session);
+        if (parsed?.name) greeting = parsed.name;
       }
+    } catch {
+      /* ignore */
     }
-  }, []);
+  }
 
   // Real mode: if you're signed in but haven't finished onboarding, go build your profile.
   useEffect(() => {
@@ -54,7 +57,9 @@ export default function DashboardPage() {
         {/* Countdown band */}
         <section className="border-b-2 border-ink/80 bg-paper/60">
           <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
-            {loading ? (
+            {!loading && !real ? (
+              <ConnectNotice />
+            ) : loading ? (
               <div className="space-y-3">
                 <Skeleton className="h-4 w-48" />
                 <Skeleton className="h-16 w-40" />
@@ -66,7 +71,10 @@ export default function DashboardPage() {
                 </p>
                 <div className="mt-4 flex flex-wrap items-end justify-between gap-6">
                   <div>
-                    <p className="board text-6xl font-bold text-foreground sm:text-7xl">
+                    <p
+                      className="board text-6xl font-bold text-foreground sm:text-7xl"
+                      suppressHydrationWarning
+                    >
                       {days}
                     </p>
                     <p className="board mt-1 text-xs text-muted-foreground">

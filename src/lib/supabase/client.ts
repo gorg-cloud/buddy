@@ -6,7 +6,7 @@ let client: ReturnType<typeof createBrowserClient> | null = null;
 
 /**
  * Browser Supabase client (cookie-backed so the server can read the
- * session). Returns null in demo mode — when the env keys aren't set.
+ * session). Returns null until the env keys are set.
  */
 export function getSupabase() {
   if (!isSupabaseConfigured()) return null;

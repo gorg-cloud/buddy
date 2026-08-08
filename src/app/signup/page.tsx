@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Lock, Plane } from "lucide-react";
+import { ArrowRight, Plane } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/logo";
-import { SESSION_KEY, isSupabaseConfigured, type Session } from "@/lib/auth";
+import {
+  ROLE_KEY,
+  SESSION_KEY,
+  isSupabaseConfigured,
+  type Session,
+} from "@/lib/auth";
 import { getSupabase } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -41,24 +46,31 @@ export default function SignupPage() {
     e.preventDefault();
     setBusy(true);
 
-    if (isSupabaseConfigured()) {
-      const supabase = getSupabase();
-      const { error } = await supabase!.auth.signUp({ email, password });
-      if (error) {
-        toast.error(error.message);
-        setBusy(false);
-        return;
-      }
-      toast.success("Check your email to confirm your account");
-      router.push("/login");
+    if (!isSupabaseConfigured()) {
+      toast.error(
+        "Supabase isn't connected yet — add your keys to .env.local and restart"
+      );
+      setBusy(false);
       return;
     }
 
-    // Demo mode
+    const supabase = getSupabase();
+    const { error } = await supabase!.auth.signUp({
+      email,
+      password,
+      options: { data: { name } },
+    });
+    if (error) {
+      toast.error(error.message);
+      setBusy(false);
+      return;
+    }
+    // The role travels to onboarding so it lands in the profile row.
+    localStorage.setItem(ROLE_KEY, role);
     const session: Session = { name, email, role, onboarded: false };
     localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-    toast.success("Demo account created — let's build your profile");
-    router.push("/onboarding");
+    toast.success("Check your email to confirm your account");
+    router.push("/login");
   }
 
   return (
@@ -102,6 +114,12 @@ export default function SignupPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-5">
+              {!isSupabaseConfigured() && (
+                <p className="board border-2 border-amber/40 bg-amber/10 px-3 py-2 text-[10px] tracking-[0.15em] text-amber-deep">
+                  CONNECT SUPABASE TO ENABLE REAL ACCOUNTS — KEYS GO IN
+                  .ENV.LOCAL
+                </p>
+              )}
               <div className="grid gap-2">
                 {roles.map((r) => (
                   <button

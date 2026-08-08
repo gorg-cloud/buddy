@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ArrowRight, Handshake, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
+import { ConnectNotice } from "@/components/connect-notice";
 import { ProfileCard } from "@/components/profile-card";
 import { PageHeader } from "@/components/signage";
 import { SiteFooter } from "@/components/site-footer";
@@ -42,7 +43,9 @@ export default function MatchesPage() {
         />
 
         <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
-          {loading ? (
+          {!loading && !real ? (
+            <ConnectNotice />
+          ) : loading ? (
             <Skeleton className="h-96 w-full" />
           ) : buddy ? (
             <div className="grid gap-8 lg:grid-cols-[1.5fr_1fr]">

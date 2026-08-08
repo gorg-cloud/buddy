@@ -34,9 +34,12 @@ npm run dev
 # → http://localhost:3000
 ```
 
-**Demo mode:** until Supabase keys are added, the site runs with sample data — every page works, sign-up drops you straight in.
+**There is no demo mode.** Buddy shows honest empty states until the
+Supabase connection is live — no fabricated people, no fake arrivals. The
+map itself is already the real world (OpenStreetMap tiles, real country
+coordinates from the ISO dataset, browser-geolocation "Find me").
 
-## Go live (Supabase, ~5 minutes)
+## Connect Supabase (~5 minutes)
 
 1. Create a free project at [supabase.com](https://supabase.com).
 2. Open **SQL Editor → New query**, paste the contents of [`supabase/schema.sql`](supabase/schema.sql), run it.
@@ -44,7 +47,16 @@ npm run dev
    - `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (public)
    - `SUPABASE_SERVICE_ROLE_KEY` (**secret**, server-only — the matching engine needs it to find buddy profiles)
    See [`.env.local.example`](.env.local.example).
-4. Restart `npm run dev`. Real accounts now work.
+4. Restart `npm run dev`. Real accounts, matching, the arrival board, and
+   map pins all come alive.
+
+**What connects once keys are in:**
+
+- **Auth** — signup/login talk to Supabase Auth (email confirmation on by default).
+- **Profiles + matching** — onboarding writes your real profile; the matching engine pairs you with the buddy in your destination country closest to your age and creates starter missions.
+- **The arrival board** — a mover's flight appears as *WAITING* and flips to *FOUND* the moment they're matched.
+- **The map** — real anchors and movers appear as pins at their country's real coordinates, filtered by the same ISO country dataset.
+- **Missions** — toggling a mission done persists to the database.
 
 **How matching works:** finish onboarding → your profile is saved → the
 matching engine pairs you with the buddy in your destination country

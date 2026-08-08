@@ -3,13 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { isSupabaseConfigured } from "@/lib/auth";
-import {
-  currentUser as demoUser,
-  missions as demoMissions,
-  profiles,
-  type BuddyProfile,
-  type Mission,
-} from "@/lib/demo-data";
+import type { BuddyProfile, Mission } from "@/lib/types";
 
 interface MatchState {
   loading: boolean;
@@ -19,9 +13,13 @@ interface MatchState {
   missions: Mission[];
 }
 
-const demoBuddy = profiles.find(
-  (p) => p.role === "buddy" && p.to === demoUser.to
-) ?? null;
+const empty: MatchState = {
+  loading: false,
+  real: false,
+  me: null,
+  buddy: null,
+  missions: [],
+};
 
 /** Normalize a database profile row into the shape the UI expects. */
 function toBuddyProfile(row: Record<string, unknown>): BuddyProfile {
@@ -39,7 +37,6 @@ function toBuddyProfile(row: Record<string, unknown>): BuddyProfile {
     answers: (row.answers as Record<string, string>) ?? {},
     carried: Number(row.carried ?? 0),
     languages: Array.isArray(row.languages) ? row.languages : [],
-    emoji: String(row.emoji ?? "🧭"),
   };
 }
 
@@ -53,26 +50,20 @@ function toMission(row: Record<string, unknown>): Mission {
   };
 }
 
+/**
+ * The match state, straight from the database. There is no demo mode:
+ * without a Supabase connection you get an honest empty state, and the
+ * moment the connection is live this returns real data.
+ */
 export function useMatch(): MatchState {
-  const [state, setState] = useState<MatchState>({
-    loading: true,
-    real: false,
-    me: demoUser,
-    buddy: demoBuddy,
-    missions: demoMissions,
-  });
+  const [state, setState] = useState<MatchState>(() =>
+    isSupabaseConfigured()
+      ? { loading: true, real: false, me: null, buddy: null, missions: [] }
+      : empty
+  );
 
   useEffect(() => {
-    if (!isSupabaseConfigured()) {
-      setState({
-        loading: false,
-        real: false,
-        me: demoUser,
-        buddy: demoBuddy,
-        missions: demoMissions,
-      });
-      return;
-    }
+    if (!isSupabaseConfigured()) return;
 
     let cancelled = false;
     fetch("/api/matches")

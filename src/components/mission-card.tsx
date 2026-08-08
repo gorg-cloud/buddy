@@ -4,8 +4,8 @@ import { useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-
-import type { Mission } from "@/lib/demo-data";
+import { isSupabaseConfigured } from "@/lib/auth";
+import type { Mission } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const kindLabel = {
@@ -17,13 +17,28 @@ const kindLabel = {
 export function MissionCard({ mission }: { mission: Mission }) {
   const [done, setDone] = useState(mission.done);
 
+  function toggle() {
+    const next = !done;
+    setDone(next);
+    // Persist to the database. Best-effort: the UI already flipped.
+    if (isSupabaseConfigured()) {
+      fetch("/api/missions", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: mission.id, done: next }),
+      }).catch(() => {
+        /* keep the local toggle; the row will resync on next load */
+      });
+    }
+  }
+
   return (
     <Card className={cn("gap-0 overflow-hidden p-0", done && "opacity-70")}>
       <div className="flex items-start justify-between gap-3 p-4">
         <button
           type="button"
-          onClick={() => setDone((d) => !d)}
-          className="flex items-start gap-3 text-left"
+          onClick={toggle}
+          className="flex cursor-pointer items-start gap-3 text-left"
           aria-pressed={done}
         >
           {done ? (
