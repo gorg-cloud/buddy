@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
-import { Archivo, Bricolage_Grotesque, Space_Mono } from "next/font/google";
+import { Anton, Public_Sans, Space_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 
 import "./globals.css";
 
-const display = Bricolage_Grotesque({
-  variable: "--font-bricolage",
+const display = Anton({
+  variable: "--font-anton",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: "400",
 });
 
-const body = Archivo({
-  variable: "--font-archivo",
+const body = Public_Sans({
+  variable: "--font-public",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
@@ -34,11 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
-      lang="en"
-      className="dark"
-      suppressHydrationWarning
-    >
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${display.variable} ${body.variable} ${mono.variable} min-h-full bg-background font-sans antialiased`}
       >
@@ -48,8 +44,9 @@ export default function RootLayout({
           toastOptions={{
             style: {
               background: "var(--card)",
-              border: "1px solid var(--border)",
+              border: "1px solid var(--ink)",
               color: "var(--foreground)",
+              borderRadius: "2px",
             },
           }}
         />

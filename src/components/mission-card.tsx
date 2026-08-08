@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, Circle } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -19,13 +18,8 @@ export function MissionCard({ mission }: { mission: Mission }) {
   const [done, setDone] = useState(mission.done);
 
   return (
-    <Card
-      className={cn(
-        "gap-3 p-4 transition-colors",
-        done && "opacity-70"
-      )}
-    >
-      <div className="flex items-start justify-between gap-3">
+    <Card className={cn("gap-0 overflow-hidden p-0", done && "opacity-70")}>
+      <div className="flex items-start justify-between gap-3 p-4">
         <button
           type="button"
           onClick={() => setDone((d) => !d)}
@@ -33,15 +27,19 @@ export function MissionCard({ mission }: { mission: Mission }) {
           aria-pressed={done}
         >
           {done ? (
-            <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-success" />
+            <span className="board mt-0.5 flex size-5 shrink-0 items-center justify-center border-2 border-signal bg-signal text-[11px] font-bold text-paper">
+              ✓
+            </span>
           ) : (
-            <Circle className="mt-0.5 size-5 shrink-0 text-muted-foreground" />
+            <span className="board mt-0.5 flex size-5 shrink-0 items-center justify-center border-2 border-ink/30 text-[10px] text-ink/40">
+              &nbsp;
+            </span>
           )}
           <span>
             <span
               className={cn(
-                "font-display text-sm font-semibold",
-                done && "line-through decoration-muted-foreground/50"
+                "font-display text-sm uppercase tracking-wide",
+                done && "text-ink/40 line-through decoration-ink/40"
               )}
             >
               {mission.title}

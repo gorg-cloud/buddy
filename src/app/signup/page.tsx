@@ -64,27 +64,26 @@ export default function SignupPage() {
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
       {/* left — mission panel */}
-      <div className="relative hidden overflow-hidden border-r border-border bg-card lg:block">
-        <div className="terminal-grid absolute inset-0" aria-hidden />
-        <div className="glow-amber absolute inset-0" aria-hidden />
+      <div className="relative hidden overflow-hidden border-r-2 border-ink bg-ink lg:block">
         <div className="relative flex h-full flex-col justify-between p-12">
-          <Logo />
+          <Logo on="ink" />
           <div>
-            <p className="board text-xs text-primary">● JOIN THE CHAIN</p>
-            <h1 className="mt-4 font-display text-4xl leading-tight font-extrabold">
+            <p className="board text-xs tracking-[0.25em] text-amber">
+              Join the chain
+            </p>
+            <h1 className="mt-4 font-display text-4xl leading-tight uppercase tracking-tight text-paper">
               Your first day
               <br />
               doesn&apos;t have to
               <br />
-              start at <span className="text-primary">zero</span>.
+              start at <span className="text-amber">zero</span>.
             </h1>
-            <p className="mt-4 max-w-sm text-muted-foreground">
+            <p className="mt-4 max-w-sm text-paper/70">
               Two minutes to make your profile. One buddy before you land.
               A chain that never stops.
             </p>
           </div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Lock className="size-3.5 text-primary" />
+          <div className="board flex items-center gap-2 text-[11px] tracking-[0.2em] text-paper/50">
             Profiles are private by design. Nothing public, ever.
           </div>
         </div>
@@ -94,7 +93,9 @@ export default function SignupPage() {
       <div className="flex items-center justify-center px-4 py-12">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle className="font-display text-2xl">Get a buddy</CardTitle>
+            <CardTitle className="font-display text-2xl uppercase">
+              Get a buddy
+            </CardTitle>
             <CardDescription>
               First, what are you here for?
             </CardDescription>
@@ -108,22 +109,31 @@ export default function SignupPage() {
                     type="button"
                     onClick={() => setRole(r.value)}
                     className={cn(
-                      "flex items-center gap-3 rounded-lg border border-border bg-muted/30 p-3 text-left transition-colors",
-                      role === r.value &&
-                        "border-primary bg-primary/10"
+                      "flex items-center gap-3 border-2 border-ink/25 bg-paper p-3 text-left transition-colors",
+                      role === r.value && "border-ink bg-ink text-paper"
                     )}
                   >
                     <Plane
                       className={cn(
-                        "size-4 text-muted-foreground",
-                        role === r.value && "text-primary"
+                        "size-4 text-ink/50",
+                        role === r.value && "text-amber"
                       )}
                     />
                     <span>
-                      <span className="block text-sm font-semibold">
+                      <span
+                        className={cn(
+                          "block font-display text-sm uppercase tracking-wide",
+                          role === r.value ? "text-paper" : "text-ink"
+                        )}
+                      >
                         {r.label}
                       </span>
-                      <span className="block text-xs text-muted-foreground">
+                      <span
+                        className={cn(
+                          "block text-xs",
+                          role === r.value ? "text-paper/70" : "text-muted-foreground"
+                        )}
+                      >
                         {r.hint}
                       </span>
                     </span>

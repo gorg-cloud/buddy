@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Compass } from "lucide-react";
 
+import { PageHeader } from "@/components/signage";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
@@ -11,32 +12,26 @@ export default function AboutPage() {
       <SiteHeader />
 
       <main className="flex-1">
-        <section className="border-b border-border/70">
-          <div className="mx-auto w-full max-w-3xl px-4 py-20 sm:px-6">
-            <p className="board text-xs text-primary">THE STORY</p>
-            <h1 className="mt-3 font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
-              I moved countries every 2–3 years.
-              <br />
-              <span className="text-primary">Every single time,</span> I built
+        <PageHeader
+          tag="The story"
+          title={
+            <>
+              I moved countries every 2–3 years.{" "}
+              <span className="text-amber">Every single time,</span> I built
               my life from zero.
-            </h1>
-            <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-              New country. New school. New language of friendship to learn.
-              I&apos;d make my people, find my corner, start to belong — and
-              then the move would come and it would all be destroyed. Not
-              slowly. Overnight.
-            </p>
-          </div>
-        </section>
+            </>
+          }
+          lede="New country. New school. New language of friendship to learn. I'd make my people, find my corner, start to belong — and then the move would come and it would all be destroyed. Not slowly. Overnight."
+        />
 
         <section className="mx-auto w-full max-w-3xl px-4 py-16 sm:px-6">
-          <div className="space-y-8 text-base leading-relaxed text-foreground/85">
+          <div className="space-y-8 text-base leading-relaxed text-ink/80">
             <p>
               The worst part was never the packing or the paperwork. It was{" "}
-              <strong className="text-foreground">day one</strong>. Walking
-              into a school where everyone already had their people, their
-              inside jokes, their seats — and I had nothing. I&apos;ve been the
-              new kid more times than I can count, and it never got easier.
+              <strong className="text-ink">day one</strong>. Walking into a
+              school where everyone already had their people, their inside
+              jokes, their seats — and I had nothing. I&apos;ve been the new
+              kid more times than I can count, and it never got easier.
             </p>
             <p>
               People say kids are resilient. And it&apos;s true — I always
@@ -51,11 +46,11 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="mt-14 rounded-xl border border-border bg-card p-8">
+          <div className="mt-14 border-2 border-ink/30 bg-paper p-8 shadow-[3px_3px_0_0_rgba(22,19,14,0.14)]">
             <div className="flex items-start gap-4">
-              <Compass className="mt-1 size-6 shrink-0 text-primary" />
+              <Compass className="mt-1 size-6 shrink-0 text-amber" />
               <div>
-                <h2 className="font-display text-2xl font-bold">
+                <h2 className="font-display text-2xl uppercase tracking-tight">
                   Never start at zero.
                 </h2>
                 <p className="mt-2 text-muted-foreground">

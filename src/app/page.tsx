@@ -1,14 +1,10 @@
 import Link from "next/link";
-import {
-  ArrowRight,
-  HeartHandshake,
-  Lock,
-  MapPin,
-  MessageCircleQuestion,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import { ArrivalBoard } from "@/components/arrival-board";
+import { Barcode } from "@/components/barcode";
 import { ProfileCard } from "@/components/profile-card";
+import { Signage } from "@/components/signage";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
@@ -16,21 +12,60 @@ import { profiles } from "@/lib/demo-data";
 
 const chain = [
   {
-    step: "01",
+    no: "01",
     title: "Arrive",
     body: "Tell us where you're going and when. We match you with a student already at your new school — before you even land.",
   },
   {
-    step: "02",
+    no: "02",
     title: "Get carried",
     body: "You talk for weeks before day one. Your buddy walks you through the school, the city, and that terrifying first morning.",
   },
   {
-    step: "03",
+    no: "03",
     title: "Carry",
     body: "Six months in, you're the one who knows the place. You become a buddy for the next kid arriving. The chain continues.",
   },
 ];
+
+const tapeMessage =
+  "NO LIKES · NO FOLLOWERS · NO ALGORITHMS — JUST ONE PERSON";
+
+function ChainStub({
+  no,
+  title,
+  body,
+}: {
+  no: string;
+  title: string;
+  body: string;
+}) {
+  return (
+    <div className="relative flex h-full flex-col border-2 border-ink/30 bg-paper shadow-[3px_3px_0_0_rgba(22,19,14,0.14)]">
+      <div className="perf border-b border-dashed border-ink/30" aria-hidden />
+      <div className="flex flex-1 flex-col p-5">
+        <div className="flex items-center justify-between gap-3">
+          <p className="board text-[11px] tracking-[0.25em] text-amber">
+            SEQUENCE {no}
+          </p>
+          <Barcode seed={title} className="h-5 w-16 shrink-0" />
+        </div>
+        <h3 className="mt-3 font-display text-3xl uppercase leading-none tracking-tight text-ink">
+          {title}
+        </h3>
+        <p className="mt-3 text-sm leading-relaxed text-ink/70">{body}</p>
+        <div className="mt-auto flex items-center justify-between border-t border-dashed border-ink/25 pt-3">
+          <span className="board text-[9px] tracking-[0.2em] text-ink/45">
+            PASS — BUDDY CHAIN
+          </span>
+          <span className="board text-[9px] tracking-[0.2em] text-ink/45">
+            NO. {no}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Home() {
   return (
@@ -38,27 +73,28 @@ export default function Home() {
       <SiteHeader />
 
       <main className="flex-1">
-        {/* HERO */}
+        {/* HERO — the check-in desk */}
         <section className="relative overflow-hidden">
           <div className="terminal-grid absolute inset-0" aria-hidden />
           <div className="glow-amber absolute inset-0" aria-hidden />
-          <div className="relative mx-auto grid w-full max-w-6xl gap-12 px-4 pt-20 pb-16 sm:px-6 lg:grid-cols-2 lg:items-center lg:gap-16 lg:pt-28 lg:pb-24">
+          <div className="relative mx-auto grid w-full max-w-6xl gap-12 px-4 pt-16 pb-20 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-16 lg:pt-24 lg:pb-28">
             <div>
-              <p className="board text-xs text-primary">
-                ● FOR KIDS WHO MOVE · 14+
+              <p className="board inline-flex items-center gap-2 border-2 border-ink/25 bg-paper/70 px-2.5 py-1 text-[11px] tracking-[0.22em] text-ink/70">
+                <span className="size-1.5 bg-amber" aria-hidden />
+                For kids who move · 14+
               </p>
-              <h1 className="mt-5 font-display text-5xl leading-[1.02] font-extrabold tracking-tight text-foreground sm:text-6xl lg:text-7xl">
+              <h1 className="mt-6 font-display text-5xl uppercase leading-[0.95] tracking-tight text-ink sm:text-7xl lg:text-[5.5rem]">
                 Never start
                 <br />
-                at <span className="text-primary">zero</span>.
+                at <span className="text-amber">zero</span>.
               </h1>
-              <p className="mt-6 max-w-md text-lg leading-relaxed text-muted-foreground">
+              <p className="mt-6 max-w-md text-lg leading-relaxed text-ink/70">
                 Buddy matches you with someone at your new school{" "}
-                <span className="text-foreground">before you arrive</span> — so
-                your first day starts with one familiar face, not a room full of
-                strangers.
+                <strong className="text-ink">before you arrive</strong> — so
+                your first day starts with one familiar face, not a room full
+                of strangers.
               </p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                 <Button size="lg" asChild>
                   <Link href="/signup">
                     Get a buddy <ArrowRight />
@@ -68,8 +104,8 @@ export default function Home() {
                   <Link href="/how-it-works">See how it works</Link>
                 </Button>
               </div>
-              <p className="board mt-6 text-[11px] text-muted-foreground">
-                no likes · no followers · no algorithms — just one person
+              <p className="board mt-8 text-[10px] tracking-[0.25em] text-ink/50">
+                Check-in desk 01 · boarding pass required
               </p>
             </div>
 
@@ -77,139 +113,216 @@ export default function Home() {
           </div>
         </section>
 
-        {/* THE CHAIN */}
-        <section className="border-t border-border/70">
-          <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6">
-            <p className="board text-xs text-primary">THE CHAIN</p>
-            <h2 className="mt-3 max-w-2xl font-display text-3xl font-bold tracking-tight sm:text-4xl">
-              Everyone who was helped, helps.
-            </h2>
-            <p className="mt-4 max-w-2xl text-muted-foreground">
-              This isn&apos;t a social network. It&apos;s a chain — and the
-              only stat that matters is how many kids you&apos;ve carried.
-            </p>
+        {/* TICKER TAPE */}
+        <div
+          className="overflow-hidden border-y-2 border-ink bg-ink py-2.5"
+          aria-hidden
+        >
+          <div className="tape-track board text-xs tracking-[0.3em] text-amber">
+            {[0, 1, 2, 3].map((i) => (
+              <span key={i} className="flex shrink-0 items-center">
+                <span className="px-6">{tapeMessage}</span>
+                <span className="text-amber/50">✈</span>
+              </span>
+            ))}
+            {[0, 1, 2, 3].map((i) => (
+              <span key={`b-${i}`} className="flex shrink-0 items-center">
+                <span className="px-6">{tapeMessage}</span>
+                <span className="text-amber/50">✈</span>
+              </span>
+            ))}
+          </div>
+        </div>
 
-            <div className="mt-12 grid gap-6 md:grid-cols-3">
-              {chain.map((item) => (
-                <div
-                  key={item.step}
-                  className="relative rounded-xl border border-border bg-card p-6"
-                >
-                  <span className="board text-4xl text-primary/60">
-                    {item.step}
-                  </span>
-                  <h3 className="mt-4 font-display text-xl font-semibold">
-                    {item.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                    {item.body}
-                  </p>
-                </div>
-              ))}
+        {/* THE CHAIN */}
+        <section className="relative">
+          <Signage tag="The design" className="pt-10 pb-12 sm:pt-14 sm:pb-16">
+            The chain, not the feed.
+          </Signage>
+          <div className="mx-auto w-full max-w-6xl px-4 pb-20 sm:px-6">
+            <div className="relative mt-10">
+              {/* dashed connector */}
+              <div
+                className="absolute top-6 right-[12%] left-[12%] hidden border-t-2 border-dashed border-ink/30 lg:block"
+                aria-hidden
+              />
+              <div className="grid gap-6 md:grid-cols-3">
+                {chain.map((item) => (
+                  <ChainStub key={item.no} {...item} />
+                ))}
+              </div>
             </div>
+            <p className="board mt-10 text-[11px] tracking-[0.2em] text-ink/55">
+              Everyone who was helped, helps. The only stat that matters is
+              how many kids you&apos;ve carried.
+            </p>
           </div>
         </section>
 
         {/* QUESTIONS, NOT BIOS */}
-        <section className="border-t border-border/70 bg-card/40">
-          <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6">
-            <div className="grid gap-12 lg:grid-cols-[1fr_1.3fr] lg:items-start">
-              <div>
-                <p className="board text-xs text-primary">
-                  QUESTIONS, NOT BIOS
-                </p>
-                <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">
-                  You connect over answers.
-                  <br />
-                  Not vibes.
-                </h2>
-                <p className="mt-4 leading-relaxed text-muted-foreground">
-                  No &quot;about me&quot; bios. No curated photos. Your profile
-                  is the truth: what scares you, what you want, what you do
-                  when you feel alone. That&apos;s what you and your buddy talk
-                  about first — so there&apos;s no awkward &quot;hi, how are
-                  you.&quot;
-                </p>
-                <div className="mt-6 flex items-center gap-2 text-sm text-muted-foreground">
-                  <Lock className="size-4 text-primary" />
-                  Profiles are private — visible only to your matches.
-                </div>
+        <section className="border-t-2 border-ink/80">
+          <Signage tag="Questions, not bios">You connect over answers.</Signage>
+          <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_1.3fr] lg:items-start lg:py-20">
+            <div>
+              <h2 className="font-display text-3xl uppercase leading-tight tracking-tight text-ink sm:text-4xl">
+                Not vibes.
+              </h2>
+              <p className="mt-4 leading-relaxed text-ink/70">
+                No &quot;about me&quot; bios. No curated photos. Your profile
+                is the truth: what scares you, what you want, what you do when
+                you feel alone. That&apos;s what you and your buddy talk about
+                first — so there&apos;s no awkward &quot;hi, how are you.&quot;
+              </p>
+              <div className="mt-6 inline-flex items-center gap-2 border-2 border-ink/25 bg-paper px-3 py-2 text-sm text-ink/70">
+                <span className="board text-[10px] tracking-[0.2em] text-signal">
+                  PRIVATE
+                </span>
+                Profiles are visible only to your matches.
               </div>
-              <div className="grid gap-6 sm:grid-cols-2">
-                <ProfileCard profile={profiles[0]} compact />
-                <ProfileCard profile={profiles[1]} compact />
-              </div>
+            </div>
+            <div className="grid gap-6 sm:grid-cols-2">
+              <ProfileCard profile={profiles[0]} compact />
+              <ProfileCard profile={profiles[1]} compact />
             </div>
           </div>
         </section>
 
         {/* THE MAP */}
-        <section className="border-t border-border/70">
-          <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6">
-            <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
-              <div className="order-2 lg:order-1">
-                <div className="rounded-xl border border-border bg-card p-4">
-                  <svg viewBox="0 0 400 260" className="mx-auto w-full max-w-md" aria-hidden>
-                    <circle cx="200" cy="130" r="90" fill="none" stroke="var(--border)" strokeWidth="1" strokeDasharray="3 5" />
-                    <circle cx="200" cy="130" r="50" fill="none" stroke="var(--border)" strokeWidth="1" strokeDasharray="3 5" />
-                    <circle cx="200" cy="130" r="10" fill="var(--primary)" />
-                    <circle cx="120" cy="90" r="8" fill="var(--primary)" opacity="0.9" />
-                    <circle cx="272" cy="72" r="6" fill="var(--accent)" opacity="0.9" />
-                    <circle cx="150" cy="180" r="8" fill="var(--primary)" opacity="0.9" />
-                    <circle cx="290" cy="160" r="6" fill="var(--accent)" opacity="0.9" />
-                    <circle cx="210" cy="48" r="6" fill="var(--accent)" opacity="0.9" />
-                  </svg>
-                </div>
-              </div>
-              <div className="order-1 lg:order-2">
-                <p className="board text-xs text-primary">THE MAP</p>
-                <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">
-                  People who&apos;ve been
-                  <br />
-                  where you&apos;re going.
-                </h2>
-                <p className="mt-4 leading-relaxed text-muted-foreground">
-                  See who&apos;s in your country — <strong className="text-foreground">anchors</strong>{" "}
-                  who&apos;ve lived there for years and answer your questions,
-                  and <strong className="text-foreground">peers</strong> moving
-                  the same way you are. Anchors guide. They don&apos;t meet up.
-                </p>
-                <div className="mt-6 flex items-center gap-2 text-sm text-muted-foreground">
-                  <MapPin className="size-4 text-primary" />
-                  Your world, as ripples. Never alone in the crowd.
-                </div>
-                <Button variant="outline" className="mt-8" asChild>
-                  <Link href="/map">
-                    Open the map <ArrowRight />
-                  </Link>
-                </Button>
-              </div>
+        <section className="border-t-2 border-ink/80">
+          <Signage tag="The map">
+            People who&apos;ve been where you&apos;re going.
+          </Signage>
+          <div className="mx-auto grid w-full max-w-6xl gap-12 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-20">
+            <div className="border-2 border-ink/30 bg-paper p-4 shadow-[3px_3px_0_0_rgba(22,19,14,0.14)]">
+              <svg
+                viewBox="0 0 400 260"
+                className="mx-auto w-full max-w-md"
+                aria-hidden
+              >
+                <circle
+                  cx="200"
+                  cy="130"
+                  r="90"
+                  fill="none"
+                  stroke="var(--ink)"
+                  strokeOpacity="0.18"
+                  strokeWidth="1.5"
+                  strokeDasharray="4 6"
+                />
+                <circle
+                  cx="200"
+                  cy="130"
+                  r="50"
+                  fill="none"
+                  stroke="var(--ink)"
+                  strokeOpacity="0.18"
+                  strokeWidth="1.5"
+                  strokeDasharray="4 6"
+                />
+                <circle cx="200" cy="130" r="8" fill="var(--amber)" />
+                <circle
+                  cx="120"
+                  cy="90"
+                  r="6"
+                  fill="var(--amber)"
+                  opacity="0.95"
+                />
+                <circle
+                  cx="272"
+                  cy="72"
+                  r="5"
+                  fill="var(--signal)"
+                  opacity="0.95"
+                />
+                <circle
+                  cx="150"
+                  cy="180"
+                  r="6"
+                  fill="var(--amber)"
+                  opacity="0.95"
+                />
+                <circle
+                  cx="290"
+                  cy="160"
+                  r="5"
+                  fill="var(--signal)"
+                  opacity="0.95"
+                />
+                <circle
+                  cx="210"
+                  cy="48"
+                  r="5"
+                  fill="var(--signal)"
+                  opacity="0.95"
+                />
+                <text
+                  x="200"
+                  y="162"
+                  textAnchor="middle"
+                  fontFamily="var(--font-space-mono)"
+                  fontSize="10"
+                  fontWeight="700"
+                  letterSpacing="2"
+                  fill="var(--ink)"
+                >
+                  YOU
+                </text>
+              </svg>
+              <p className="board mt-2 text-center text-[10px] tracking-[0.2em] text-ink/50">
+                Anchors guide. They don&apos;t meet up.
+              </p>
+            </div>
+            <div>
+              <p className="board text-[11px] tracking-[0.22em] text-ink/55">
+                Anchors &amp; peers — never a crowd
+              </p>
+              <h2 className="mt-3 font-display text-4xl uppercase leading-[1.02] tracking-tight text-ink sm:text-5xl">
+                Your world, as ripples.
+              </h2>
+              <p className="mt-5 max-w-lg leading-relaxed text-ink/70">
+                See who&apos;s in your country —{" "}
+                <strong className="text-ink">anchors</strong> who&apos;ve
+                lived there for years and answer your questions, and{" "}
+                <strong className="text-ink">peers</strong> moving the same
+                way you are. Never alone in the crowd.
+              </p>
+              <Button variant="outline" className="mt-8" asChild>
+                <Link href="/map">
+                  Open the map <ArrowRight />
+                </Link>
+              </Button>
             </div>
           </div>
         </section>
 
-        {/* MISSION BAND */}
-        <section className="border-t border-border/70">
-          <div className="mx-auto w-full max-w-6xl px-4 py-20 text-center sm:px-6">
-            <MessageCircleQuestion className="mx-auto size-8 text-primary" />
-            <h2 className="mx-auto mt-4 max-w-2xl font-display text-3xl font-bold tracking-tight sm:text-4xl">
-              Day one is the hardest day.
-              <br />
-              You don&apos;t have to face it alone.
+        {/* NOW BOARDING — the close */}
+        <section className="border-t-2 border-ink bg-ink text-paper">
+          <div className="mx-auto w-full max-w-6xl px-4 py-16 text-center sm:px-6 sm:py-20">
+            <p className="board inline-flex items-center gap-2 text-[11px] tracking-[0.3em] text-amber">
+              <span className="size-1.5 rounded-full bg-alarm shadow-[0_0_7px_2px_rgba(196,59,44,0.55)]" />
+              Now boarding
+            </p>
+            <h2 className="mx-auto mt-5 max-w-3xl font-display text-4xl uppercase leading-[1.02] tracking-tight sm:text-5xl md:text-6xl">
+              Day one is the hardest day. You don&apos;t have to face it
+              alone.
             </h2>
-            <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
+            <p className="mx-auto mt-6 max-w-xl leading-relaxed text-paper/70">
               Built by a kid who moved countries and schools more times than
               they can count. This is the thing I wish I&apos;d had — every
               single time.
             </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button size="lg" asChild>
                 <Link href="/signup">
-                  <HeartHandshake />
-                  Get your buddy
+                  Get your buddy <ArrowRight />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" asChild>
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-paper text-paper hover:bg-paper/10"
+                asChild
+              >
                 <Link href="/about">Read the story</Link>
               </Button>
             </div>

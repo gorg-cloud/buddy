@@ -52,7 +52,7 @@ export default function DashboardPage() {
 
       <main className="flex-1">
         {/* Countdown band */}
-        <section className="border-b border-border/70 bg-card/50">
+        <section className="border-b-2 border-ink/80 bg-paper/60">
           <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
             {loading ? (
               <div className="space-y-3">
@@ -114,7 +114,7 @@ export default function DashboardPage() {
           {/* Missions */}
           <div>
             <div className="flex items-center justify-between">
-              <h1 className="font-display text-2xl font-bold">
+              <h1 className="font-display text-2xl uppercase tracking-wide">
                 Hey {greeting.split(" ")[0]} — your missions
               </h1>
               <Badge variant="outline" className="board">

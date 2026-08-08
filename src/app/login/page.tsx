@@ -59,18 +59,21 @@ export default function LoginPage() {
 
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
-      <div className="relative hidden overflow-hidden border-r border-border bg-card lg:block">
-        <div className="terminal-grid absolute inset-0" aria-hidden />
-        <div className="glow-amber absolute inset-0" aria-hidden />
+      <div className="relative hidden overflow-hidden border-r-2 border-ink bg-ink lg:block">
         <div className="relative flex h-full flex-col justify-between p-12">
-          <Logo />
+          <Logo on="ink" />
           <div>
-            <p className="board text-xs text-primary">● WELCOME BACK</p>
-            <h1 className="mt-4 font-display text-4xl leading-tight font-extrabold">
+            <p className="board text-xs tracking-[0.25em] text-amber">
+              Welcome back
+            </p>
+            <h1 className="mt-4 font-display text-4xl leading-tight uppercase tracking-tight text-paper">
               Your people are
               <br />
-              still <span className="text-primary">waiting</span>.
+              still <span className="text-amber">waiting</span>.
             </h1>
+            <p className="mt-4 max-w-sm text-paper/70">
+              Your buddy is already there. Pick up where you left off.
+            </p>
           </div>
         </div>
       </div>
@@ -78,7 +81,9 @@ export default function LoginPage() {
       <div className="flex items-center justify-center px-4 py-12">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle className="font-display text-2xl">Log in</CardTitle>
+            <CardTitle className="font-display text-2xl uppercase">
+              Log in
+            </CardTitle>
             <CardDescription>Pick up where you left off.</CardDescription>
           </CardHeader>
           <CardContent>

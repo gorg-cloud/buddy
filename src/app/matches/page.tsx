@@ -7,6 +7,7 @@ import { ArrowRight, Handshake, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 import { ProfileCard } from "@/components/profile-card";
+import { PageHeader } from "@/components/signage";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Badge } from "@/components/ui/badge";
@@ -28,21 +29,17 @@ export default function MatchesPage() {
       <SiteHeader />
 
       <main className="flex-1">
-        <section className="border-b border-border/70">
-          <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
-            <p className="board text-xs text-primary">YOUR MATCHES</p>
-            <h1 className="mt-3 font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
-              Someone is already waiting.
-            </h1>
-            <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
-              {buddy
-                ? `Matched by destination and age: ${buddy.name}, at ${
-                    buddy.school || "their school"
-                  } in ${buddy.to || "your destination"}.`
-                : "We're still matching you — check back soon."}
-            </p>
-          </div>
-        </section>
+        <PageHeader
+          tag="Your matches"
+          title="Someone is already waiting."
+          lede={
+            buddy
+              ? `Matched by destination and age: ${buddy.name}, at ${
+                  buddy.school || "their school"
+                } in ${buddy.to || "your destination"}.`
+              : "We're still matching you — check back soon."
+          }
+        />
 
         <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
           {loading ? (

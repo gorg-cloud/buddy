@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { anchors, profiles } from "@/lib/demo-data";
-import { cn } from "@/lib/utils";
 
 /** Deterministic pseudo-random from a string — stable across renders. */
 function hash(str: string) {
@@ -23,6 +22,15 @@ function hash(str: string) {
     h = Math.imul(h, 16777619);
   }
   return Math.abs(h);
+}
+
+function initials(name: string) {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]!.toUpperCase())
+    .join("");
 }
 
 const bandByCountry: Record<string, number> = {
@@ -47,13 +55,18 @@ export function RippleMap() {
   const people = useMemo(() => {
     const peers = profiles
       .filter((p) => p.role !== "anchor")
-      .map((p) => ({ kind: "peer" as const, id: p.id, name: p.handle, country: p.to, emoji: p.emoji, role: "moving there" as const }));
+      .map((p) => ({
+        kind: "peer" as const,
+        id: p.id,
+        name: p.handle,
+        country: p.to,
+        role: "moving there" as const,
+      }));
     const anchorsList = anchors.map((a) => ({
       kind: "anchor" as const,
       id: a.id,
       name: a.name,
       country: a.country,
-      emoji: a.emoji,
       role: "anchor — experienced" as const,
     }));
     const all = [...peers, ...anchorsList];
@@ -86,23 +99,29 @@ export function RippleMap() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-      {/* The ripple visual */}
-      <div className="rounded-xl border border-border bg-card p-4">
+      {/* The ripple visual — a paper terminal map */}
+      <div className="border-2 border-ink/30 bg-paper p-4 shadow-[3px_3px_0_0_rgba(22,19,14,0.14)]">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <p className="board text-xs text-muted-foreground">
+          <p className="board text-[11px] tracking-[0.2em] text-ink/60">
             YOUR WORLD — {people.length} PEOPLE AROUND YOU
           </p>
-          <div className="flex items-center gap-3 text-xs">
-            <span className="inline-flex items-center gap-1.5 text-muted-foreground">
-              <span className="size-2 rounded-full bg-primary" /> anchor
+          <div className="flex items-center gap-3 text-[11px]">
+            <span className="board inline-flex items-center gap-1.5 text-ink/60">
+              <span className="size-2 bg-amber" /> anchor
             </span>
-            <span className="inline-flex items-center gap-1.5 text-muted-foreground">
-              <span className="size-2 rounded-full bg-accent" /> peer
+            <span className="board inline-flex items-center gap-1.5 text-ink/60">
+              <span className="size-2 bg-signal" /> peer
             </span>
           </div>
         </div>
 
-        <svg viewBox="0 0 400 400" className="mx-auto w-full max-w-md" role="img" aria-label="Map of people around you">
+        <svg
+          viewBox="0 0 400 400"
+          className="mx-auto w-full max-w-md"
+          role="img"
+          aria-label="Map of people around you"
+        >
+          {/* paper texture rings */}
           {bands.map((b) => (
             <circle
               key={b.r}
@@ -110,36 +129,63 @@ export function RippleMap() {
               cy="200"
               r={b.r}
               fill="none"
-              stroke="var(--border)"
-              strokeWidth="1"
-              strokeDasharray="3 5"
+              stroke="var(--ink)"
+              strokeOpacity="0.18"
+              strokeWidth="1.5"
+              strokeDasharray="4 6"
             />
           ))}
           {bands.map((b) => (
             <text
               key={b.r}
               x="200"
-              y={200 - b.r - 8}
+              y={200 - b.r - 10}
               textAnchor="middle"
-              className="board"
-              fill="var(--muted-foreground)"
+              fontFamily="var(--font-space-mono)"
               fontSize="8"
+              letterSpacing="2"
+              fill="var(--ink)"
+              opacity="0.5"
             >
               {b.label}
             </text>
           ))}
 
+          {/* compass */}
+          <g transform="translate(352, 52)">
+            <circle r="14" fill="none" stroke="var(--ink)" strokeOpacity="0.4" />
+            <path d="M0 -9 L3 3 L0 0 L-3 3 Z" fill="var(--ink)" opacity="0.6" />
+            <text
+              y="-16"
+              textAnchor="middle"
+              fontFamily="var(--font-space-mono)"
+              fontSize="7"
+              letterSpacing="1"
+              fill="var(--ink)"
+              opacity="0.5"
+            >
+              N
+            </text>
+          </g>
+
           {/* center — you */}
-          <circle cx="200" cy="200" r="16" fill="var(--primary)" opacity="0.15" />
-          <circle cx="200" cy="200" r="6" fill="var(--primary)" />
+          <circle
+            cx="200"
+            cy="200"
+            r="18"
+            fill="var(--amber)"
+            opacity="0.18"
+          />
+          <circle cx="200" cy="200" r="7" fill="var(--amber)" />
           <text
             x="200"
-            y="228"
+            y="234"
             textAnchor="middle"
-            className="board"
-            fill="var(--foreground)"
-            fontSize="9"
+            fontFamily="var(--font-space-mono)"
+            fontSize="10"
             fontWeight="700"
+            letterSpacing="2"
+            fill="var(--ink)"
           >
             YOU
           </text>
@@ -150,41 +196,44 @@ export function RippleMap() {
                 cx={p.x}
                 cy={p.y}
                 r={p.kind === "anchor" ? 8 : 6}
-                fill={p.kind === "anchor" ? "var(--primary)" : "var(--accent)"}
-                opacity="0.9"
+                fill={p.kind === "anchor" ? "var(--amber)" : "var(--signal)"}
               />
               <circle
                 cx={p.x}
                 cy={p.y}
                 r={p.kind === "anchor" ? 13 : 10}
                 fill="none"
-                stroke={p.kind === "anchor" ? "var(--primary)" : "var(--accent)"}
+                stroke={p.kind === "anchor" ? "var(--amber)" : "var(--signal)"}
                 strokeWidth="1"
-                opacity="0.35"
+                opacity="0.4"
               />
               <text
                 x={p.x}
-                y={p.y + 22}
+                y={p.y + 24}
                 textAnchor="middle"
-                className="board"
-                fill="var(--muted-foreground)"
+                fontFamily="var(--font-space-mono)"
                 fontSize="8"
+                letterSpacing="1.5"
+                fill="var(--ink)"
+                opacity="0.65"
               >
-                {p.name}
+                {initials(p.name)}
               </text>
             </g>
           ))}
         </svg>
 
-        <p className="board mt-2 text-center text-[10px] text-muted-foreground">
+        <p className="board mt-2 text-center text-[10px] tracking-[0.2em] text-alarm">
           ANCHORS ANSWER QUESTIONS. THEY ARE NOT FOR MEETING UP. EVER.
         </p>
       </div>
 
       {/* List */}
-      <div className="rounded-xl border border-border bg-card p-4">
+      <div className="border-2 border-ink/30 bg-paper p-4 shadow-[3px_3px_0_0_rgba(22,19,14,0.14)]">
         <div className="flex items-center justify-between gap-2">
-          <p className="font-display text-lg font-semibold">Near you</p>
+          <p className="font-display text-lg uppercase tracking-tight">
+            Near you
+          </p>
           <Select value={country} onValueChange={setCountry}>
             <SelectTrigger className="w-40">
               <SelectValue placeholder="Country" />
@@ -203,14 +252,16 @@ export function RippleMap() {
           {pins.map((p) => (
             <div
               key={p.id}
-              className="flex items-center gap-3 rounded-lg border border-border/70 bg-muted/30 p-3"
+              className="flex items-center gap-3 border border-ink/20 bg-muted/40 p-3"
             >
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-lg">
-                {p.emoji}
+              <span className="board flex size-9 shrink-0 items-center justify-center bg-ink text-xs font-bold text-paper">
+                {initials(p.name)}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold">{p.name}</p>
-                <p className="board text-[10px] text-muted-foreground">
+                <p className="truncate font-display text-sm uppercase tracking-wide">
+                  {p.name}
+                </p>
+                <p className="board text-[10px] tracking-[0.15em] text-ink/55">
                   {p.country} · {p.role}
                 </p>
               </div>
@@ -236,11 +287,11 @@ export function RippleMap() {
 
         <Separator className="my-4" />
         <div className="flex items-start gap-3 text-sm text-muted-foreground">
-          <Compass className="mt-0.5 size-4 shrink-0 text-primary" />
+          <Compass className="mt-0.5 size-4 shrink-0 text-amber" />
           <p>
-            Anchors are kids who've lived where you're going. Ask them anything:
-            school, neighbourhoods, how to make friends fast. They're here to
-            guide — never to meet up.
+            Anchors are kids who&apos;ve lived where you&apos;re going. Ask
+            them anything: school, neighbourhoods, how to make friends fast.
+            They&apos;re here to guide — never to meet up.
           </p>
         </div>
       </div>

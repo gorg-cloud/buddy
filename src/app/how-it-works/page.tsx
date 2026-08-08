@@ -9,6 +9,7 @@ import {
   UserRoundPlus,
 } from "lucide-react";
 
+import { PageHeader, Signage } from "@/components/signage";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
@@ -67,32 +68,26 @@ export default function HowItWorksPage() {
       <SiteHeader />
 
       <main className="flex-1">
-        <section className="border-b border-border/70">
-          <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6">
-            <p className="board text-xs text-primary">HOW IT WORKS</p>
-            <h1 className="mt-3 max-w-2xl font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
-              The chain, not the feed.
-            </h1>
-            <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
-              Everyone who was helped, helps. That&apos;s the whole design.
-            </p>
-          </div>
-        </section>
+        <PageHeader
+          tag="How it works"
+          title="The chain, not the feed."
+          lede="Everyone who was helped, helps. That's the whole design."
+        />
 
         <section className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {steps.map((step, i) => (
-              <Card key={step.title}>
-                <CardHeader>
+              <Card key={step.title} className="gap-0 overflow-hidden p-0">
+                <CardHeader className="border-b border-dashed border-ink/25">
                   <div className="flex items-center justify-between">
-                    <step.icon className="size-6 text-primary" />
-                    <span className="board text-2xl text-primary/40">
+                    <step.icon className="size-5 text-amber" />
+                    <span className="board text-xl text-ink/30">
                       0{i + 1}
                     </span>
                   </div>
-                  <CardTitle>{step.title}</CardTitle>
+                  <CardTitle className="mt-2">{step.title}</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="py-4">
                   <p className="text-sm leading-relaxed text-muted-foreground">
                     {step.body}
                   </p>
@@ -102,17 +97,17 @@ export default function HowItWorksPage() {
           </div>
         </section>
 
-        <section className="border-t border-border/70 bg-card/40">
+        <section className="border-t-2 border-ink/80">
+          <Signage tag="The rules">Anti-social media, on purpose.</Signage>
           <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
-            <p className="board text-xs text-primary">THE RULES</p>
-            <h2 className="mt-3 font-display text-3xl font-bold tracking-tight">
-              Anti-social media, on purpose.
-            </h2>
-            <div className="mt-10 grid gap-6 md:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-3">
               {principles.map((p) => (
-                <div key={p.title} className="rounded-xl border border-border bg-card p-6">
-                  <p.icon className="size-6 text-primary" />
-                  <h3 className="mt-4 font-display text-lg font-semibold">
+                <div
+                  key={p.title}
+                  className="border-2 border-ink/30 bg-paper p-6 shadow-[3px_3px_0_0_rgba(22,19,14,0.14)]"
+                >
+                  <p.icon className="size-5 text-amber" />
+                  <h3 className="mt-4 font-display text-lg uppercase tracking-wide">
                     {p.title}
                   </h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
@@ -124,9 +119,9 @@ export default function HowItWorksPage() {
 
             <Separator className="my-14" />
 
-            <div className="flex flex-col items-start justify-between gap-6 rounded-xl border border-border bg-card p-8 sm:flex-row sm:items-center">
+            <div className="flex flex-col items-start justify-between gap-6 border-2 border-ink/30 bg-paper p-8 shadow-[3px_3px_0_0_rgba(22,19,14,0.14)] sm:flex-row sm:items-center">
               <div>
-                <h3 className="font-display text-2xl font-bold">
+                <h3 className="font-display text-2xl uppercase tracking-tight">
                   Your first day doesn&apos;t have to start at zero.
                 </h3>
                 <p className="mt-2 text-muted-foreground">

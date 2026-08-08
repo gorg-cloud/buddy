@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { Barcode } from "@/components/barcode";
 import { Logo } from "@/components/logo";
 
 const columns = [
@@ -25,22 +26,23 @@ const columns = [
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-border/70">
-      <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1fr_auto]">
+    <footer className="border-t-2 border-ink bg-ink text-paper">
+      <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.4fr_auto]">
         <div className="max-w-sm">
-          <Logo />
-          <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+          <Logo on="ink" />
+          <p className="mt-5 text-sm leading-relaxed text-paper/70">
             Never start at zero. Buddy matches kids moving to a new school or
             country with someone already waiting there — before they arrive.
           </p>
-          <p className="board mt-6 text-xs text-muted-foreground">
+          <p className="board mt-6 text-[11px] tracking-[0.2em] text-paper/50">
             built by a kid who moved too many times to count
           </p>
+          <Barcode seed="buddy-the-chain" className="mt-6 h-8 w-44 opacity-70" />
         </div>
         <div className="grid grid-cols-2 gap-10">
           {columns.map((col) => (
             <div key={col.title}>
-              <h3 className="board text-xs text-muted-foreground">
+              <h3 className="board text-[11px] tracking-[0.25em] text-amber">
                 {col.title}
               </h3>
               <ul className="mt-4 space-y-3">
@@ -48,7 +50,7 @@ export function SiteFooter() {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-foreground/80 transition-colors hover:text-primary"
+                      className="text-sm text-paper/70 transition-colors hover:text-amber"
                     >
                       {link.label}
                     </Link>
@@ -59,8 +61,8 @@ export function SiteFooter() {
           ))}
         </div>
       </div>
-      <div className="border-t border-border/50">
-        <div className="board mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 py-4 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <div className="border-t border-paper/15">
+        <div className="board mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 py-4 text-[11px] tracking-[0.15em] text-paper/50 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <span>© 2026 Buddy — no likes, no followers, no algorithms</span>
           <span>14+ only · profiles are private by design</span>
         </div>

@@ -3,37 +3,42 @@
 
 /*
  * BUDDY — design system
- * Theme: airports, arrivals, landing. Night-ink terminals, amber departure
- * boards, one hopeful sky-blue accent. Dark-first, always.
+ * Theme: a small airport terminal at dawn. Warm concrete walls, paper
+ * tickets, matte-black machines. Everything is a physical artifact from
+ * the world of departures and arrivals — never a glassy dark-mode app.
  */
 
 :root {
-  /* night ink — pre-dawn airport */
-  --background: hsl(220 49% 8%);
-  --foreground: hsl(40 45% 94%);
-  --card: hsl(220 42% 11%);
-  --card-foreground: hsl(40 45% 94%);
-  --popover: hsl(220 46% 10%);
-  --popover-foreground: hsl(40 45% 94%);
-  /* departure-board amber — the accent */
-  --primary: hsl(36 100% 65%);
-  --primary-foreground: hsl(220 49% 8%);
-  --secondary: hsl(220 35% 15%);
-  --secondary-foreground: hsl(40 40% 90%);
-  --muted: hsl(220 30% 14%);
-  --muted-foreground: hsl(217 20% 65%);
-  /* hopeful sky */
-  --accent: hsl(199 95% 74%);
-  --accent-foreground: hsl(220 49% 8%);
-  --destructive: hsl(0 72% 55%);
-  --destructive-foreground: hsl(40 45% 94%);
-  /* boarding-green for "FOUND" status */
-  --success: hsl(152 62% 45%);
-  --success-foreground: hsl(220 49% 8%);
-  --border: hsl(220 30% 18%);
-  --input: hsl(220 30% 20%);
-  --ring: hsl(36 100% 65%);
-  --radius: 0.75rem;
+  /* concrete — aged terminal walls and floors */
+  --background: #ddd8cc;
+  --foreground: #16130e;
+  /* paper — ticket stock */
+  --card: #f8f5ec;
+  --card-foreground: #16130e;
+  --popover: #f8f5ec;
+  --popover-foreground: #16130e;
+  /* amber — the flip-board voice */
+  --primary: #f2a516;
+  --primary-foreground: #16130e;
+  /* ink — the machines */
+  --secondary: #16130e;
+  --secondary-foreground: #f8f5ec;
+  --muted: #e6e1d4;
+  --muted-foreground: #5c564b;
+  /* signal green — FOUND / GO */
+  --accent: #0e7a45;
+  --accent-foreground: #f8f5ec;
+  /* alarm red — WAITING / attention */
+  --destructive: #c43b2c;
+  --destructive-foreground: #f8f5ec;
+  --success: #0e7a45;
+  --success-foreground: #f8f5ec;
+  /* hairlines */
+  --border: #c7c1b2;
+  --input: #b9b2a0;
+  --ring: #f2a516;
+  /* sharp — physical objects, not UI */
+  --radius: 0px;
 }
 
 @theme inline {
@@ -58,14 +63,20 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-bricolage), var(--font-archivo), ui-sans-serif,
-    sans-serif;
+  /* named artifacts */
+  --color-ink: #16130e;
+  --color-paper: #f8f5ec;
+  --color-concrete: #ddd8cc;
+  --color-amber: #f2a516;
+  --color-signal: #0e7a45;
+  --color-alarm: #c43b2c;
+  --font-sans: var(--font-public), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-anton), "Arial Narrow", ui-sans-serif, sans-serif;
   --font-mono: var(--font-space-mono), ui-monospace, SFMono-Regular, monospace;
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 2px;
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
 }
@@ -111,62 +122,118 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Split-flap flip */
-@keyframes flap {
-  0% {
-    transform: rotateX(0deg);
-    opacity: 1;
+/* Overhead terminal signage (black band) */
+.signage {
+  background: var(--ink);
+  color: var(--paper);
+  border-top: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
+}
+
+/* Perforated ticket edge */
+.perf {
+  height: 12px;
+  background-image: radial-gradient(circle, var(--paper) 4.5px, transparent 5.5px);
+  background-size: 16px 12px;
+  background-position: 0 0;
+}
+
+/* Passport-style stamp */
+.stamp {
+  font-family: var(--font-space-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 2px solid color-mix(in srgb, var(--ink) 65%, transparent);
+  color: color-mix(in srgb, var(--ink) 75%, transparent);
+  padding: 2px 8px;
+  transform: rotate(-3deg);
+}
+
+/* Scrolling terminal ticker */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
   }
-  40% {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.tape-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 30s linear infinite;
+}
+
+/* Split-flap machine */
+@keyframes flap-away {
+  from {
+    transform: rotateX(0deg);
+  }
+  to {
     transform: rotateX(-88deg);
-    opacity: 0.4;
   }
-  60% {
+}
+
+@keyframes flap-in {
+  from {
     transform: rotateX(88deg);
-    opacity: 0.4;
   }
-  100% {
+  to {
     transform: rotateX(0deg);
-    opacity: 1;
   }
 }
 
-.flap-cell {
-  display: inline-block;
-  transform-origin: 50% 50%;
-  animation: flap 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+.flap-scene {
+  perspective: 240px;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .flap-cell {
-    animation: none;
-  }
-  * {
-    scroll-behavior: auto !important;
-  }
+.flap-panel {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
 }
 
-/* Amber glow behind the hero board */
-.glow-amber {
-  background:
-    radial-gradient(
-      ellipse 60% 50% at 50% 45%,
-      hsl(36 100% 65% / 0.14),
-      transparent 70%
-    );
+.flap-half {
+  display: block;
+  line-height: 1.25;
 }
 
-/* Subtle terminal grid backdrop */
-.terminal-grid {
-  background-image:
-    linear-gradient(hsl(220 30% 18% / 0.35) 1px, transparent 1px),
-    linear-gradient(90deg, hsl(220 30% 18% / 0.35) 1px, transparent 1px);
-  background-size: 44px 44px;
-  mask-image: radial-gradient(
-    ellipse 70% 60% at 50% 40%,
-    black 30%,
-    transparent 75%
-  );
+.flap-top-old {
+  top: 0;
+  height: 50%;
+  transform-origin: top;
+  z-index: 3;
+  animation: flap-away 0.28s ease-in 0.12s forwards;
+}
+
+.flap-top-new {
+  top: 0;
+  height: 50%;
+  z-index: 1;
+}
+
+.flap-bottom-old {
+  bottom: 0;
+  height: 50%;
+  z-index: 1;
+}
+
+.flap-bottom-new {
+  bottom: 0;
+  height: 50%;
+  transform-origin: bottom;
+  z-index: 2;
+  animation: flap-in 0.28s ease-out 0.38s backwards;
+}
+
+.flap-bottom-new .flap-half {
+  transform: translateY(-0.625em);
 }
 
 /* Slow pulse for "waiting for buddy" status */
@@ -184,8 +251,36 @@
   animation: pulse-soft 2.4s ease-in-out infinite;
 }
 
+/* Subtle terminal grid backdrop (light) */
+.terminal-grid {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--ink) 7%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--ink) 7%, transparent) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 30%, transparent 75%);
+}
+
+/* Soft amber wash behind machines */
+.glow-amber {
+  background: radial-gradient(
+    ellipse 60% 50% at 50% 45%,
+    color-mix(in srgb, var(--amber) 16%, transparent),
+    transparent 70%
+  );
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .flap-top-old,
+  .flap-bottom-new {
+    animation: none;
+  }
+  .tape-track {
+    animation: none;
+  }
   .pulse-soft {
     animation: none;
+  }
+  * {
+    scroll-behavior: auto !important;
   }
 }

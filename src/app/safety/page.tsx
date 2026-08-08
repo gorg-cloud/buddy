@@ -1,5 +1,6 @@
 import { ShieldCheck } from "lucide-react";
 
+import { PageHeader } from "@/components/signage";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import {
@@ -66,24 +67,18 @@ export default function SafetyPage() {
       <SiteHeader />
 
       <main className="flex-1">
-        <section className="border-b border-border/70">
-          <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
-            <p className="board text-xs text-primary">SAFETY</p>
-            <h1 className="mt-3 font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
-              Simple rules. Absolute rules.
-            </h1>
-            <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
-              Buddy exists because starting over is lonely — and it only works
-              if it&apos;s safe. These rules are the whole design, not a
-              page of fine print.
-            </p>
-          </div>
-        </section>
+        <PageHeader
+          tag="Safety"
+          title="Simple rules. Absolute rules."
+          lede="Buddy exists because starting over is lonely — and it only works if it's safe. These rules are the whole design, not a page of fine print."
+        />
 
         <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
-          <Alert variant="sky" className="mb-10">
+          <Alert variant="sky" className="mb-10 border-2 border-ink/25">
             <ShieldCheck />
-            <AlertTitle>The one hard rule</AlertTitle>
+            <AlertTitle className="font-display uppercase tracking-wide">
+              The one hard rule
+            </AlertTitle>
             <AlertDescription>
               Anchors answer questions. They never meet up. If you ever see
               anyone arranging to meet through Buddy, report it — that&apos;s
@@ -95,9 +90,9 @@ export default function SafetyPage() {
             {rules.map((rule) => (
               <div
                 key={rule.title}
-                className="rounded-xl border border-border bg-card p-6"
+                className="border-2 border-ink/30 bg-paper p-6 shadow-[2px_2px_0_0_rgba(22,19,14,0.14)]"
               >
-                <h2 className="font-display text-lg font-semibold">
+                <h2 className="font-display text-lg uppercase tracking-wide">
                   {rule.title}
                 </h2>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
@@ -108,11 +103,15 @@ export default function SafetyPage() {
           </div>
 
           <div className="mt-16">
-            <h2 className="font-display text-2xl font-bold">Questions</h2>
-            <Accordion type="single" collapsible className="mt-4 max-w-3xl">
+            <h2 className="board text-[11px] tracking-[0.25em] text-ink/55">
+              Questions
+            </h2>
+            <Accordion type="single" collapsible className="mt-2 max-w-3xl">
               {faqs.map((faq) => (
                 <AccordionItem key={faq.q} value={faq.q}>
-                  <AccordionTrigger>{faq.q}</AccordionTrigger>
+                  <AccordionTrigger className="font-display text-base uppercase tracking-wide">
+                    {faq.q}
+                  </AccordionTrigger>
                   <AccordionContent className="text-muted-foreground">
                     {faq.a}
                   </AccordionContent>
