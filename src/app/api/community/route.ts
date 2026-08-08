@@ -106,7 +106,14 @@ export async function POST(req: Request) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    return NextResponse.json(
+      {
+        error: String(error.message).includes("Could not find the table")
+          ? "The lounge isn't set up yet — run supabase/schema-update.sql in the Supabase SQL editor, then send again"
+          : error.message,
+      },
+      { status: 400 }
+    );
   }
   return NextResponse.json({ message: data });
 }
