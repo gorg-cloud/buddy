@@ -3,7 +3,12 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, CalendarClock, Handshake } from "lucide-react";
+import {
+  ArrowRight,
+  CalendarClock,
+  Compass,
+  Handshake,
+} from "lucide-react";
 
 import { ConnectNotice } from "@/components/connect-notice";
 import { MissionCard } from "@/components/mission-card";
@@ -16,7 +21,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMatch } from "@/hooks/use-match";
-import { SESSION_KEY } from "@/lib/auth";
+import { RESTART_KEY, ROLE_KEY, SESSION_KEY } from "@/lib/auth";
 import { useMounted } from "@/lib/use-mounted";
 import { daysUntil } from "@/lib/utils";
 
@@ -44,6 +49,20 @@ export default function DashboardPage() {
   }, [loading, real, me, router]);
 
   const days = me?.moveDate && mounted ? daysUntil(me.moveDate) : 0;
+
+  function beginAgain() {
+    // New move, new country — no matter what role they had before.
+    localStorage.setItem(ROLE_KEY, "mover");
+    localStorage.setItem(RESTART_KEY, "1");
+    try {
+      const session = JSON.parse(localStorage.getItem(SESSION_KEY) || "{}");
+      session.onboarded = false;
+      localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    } catch {
+      /* ignore */
+    }
+    router.push("/onboarding");
+  }
   const doneCount = missions.filter((m) => m.done).length;
   const pct = missions.length
     ? Math.round((doneCount / missions.length) * 100)
@@ -191,6 +210,25 @@ export default function DashboardPage() {
                   the buddy for the next kid arriving at{" "}
                   {me?.school || "your school"}. The chain continues.
                 </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-amber/40 bg-amber/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Compass className="size-4 text-amber-deep" />
+                  Moving again?
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  New school, new country? Start over with Buddy wherever you
+                  land — no matter what you were before. Your chain comes with
+                  you: the kids you&apos;ve carried stay counted.
+                </p>
+                <Button variant="outline" className="w-full" onClick={beginAgain}>
+                  Begin again <ArrowRight />
+                </Button>
               </CardContent>
             </Card>
           </div>

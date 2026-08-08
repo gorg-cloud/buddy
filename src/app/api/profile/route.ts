@@ -19,8 +19,18 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { name, age, from, to, school, country, moveDate, answers, role } =
-    body;
+  const {
+    name,
+    age,
+    from,
+    to,
+    school,
+    country,
+    moveDate,
+    answers,
+    role,
+    restart,
+  } = body;
 
   const { error } = await supabase.from("profiles").upsert({
     id: user.id,
@@ -42,6 +52,18 @@ export async function POST(request: Request) {
   // Server-side extras (service role): arrivals for the public board and
   // anchor rows for the map. Never exposed to the browser.
   const admin = createSupabaseAdmin();
+
+  if (restart) {
+    // They're moving again, no matter what they were before. Close the old
+    // chapter cleanly: graduate any active match and drop the anchor row.
+    // The chain (kids carried) stays on the profile.
+    await admin
+      .from("matches")
+      .update({ status: "graduated" })
+      .or(`mover.eq.${user.id},buddy.eq.${user.id}`)
+      .eq("status", "active");
+    await admin.from("anchors").delete().eq("id", user.id);
+  }
 
   if (role === "mover") {
     // A mover's flight appears on the arrival board as WAITING, and flips

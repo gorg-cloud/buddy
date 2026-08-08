@@ -19,6 +19,9 @@ export const SESSION_KEY = "buddy:session";
 /** Role picked at signup, stored with the profile row. */
 export const ROLE_KEY = "buddy:role";
 
+/** Set when someone starts a new move from the dashboard. */
+export const RESTART_KEY = "buddy:restart";
+
 export type Session = {
   name: string;
   email: string;

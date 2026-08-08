@@ -13,7 +13,12 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Logo } from "@/components/logo";
-import { ROLE_KEY, SESSION_KEY, isSupabaseConfigured } from "@/lib/auth";
+import {
+  RESTART_KEY,
+  ROLE_KEY,
+  SESSION_KEY,
+  isSupabaseConfigured,
+} from "@/lib/auth";
 
 const questions = [
   {
@@ -63,7 +68,10 @@ export default function OnboardingPage() {
       return;
     }
 
-    const role = localStorage.getItem(ROLE_KEY) ?? "mover";
+    // A new move? No matter what they were before, they're a mover now.
+    const restart = localStorage.getItem(RESTART_KEY) === "1";
+    localStorage.removeItem(RESTART_KEY);
+    const role = restart ? "mover" : (localStorage.getItem(ROLE_KEY) ?? "mover");
     const session = JSON.parse(localStorage.getItem(SESSION_KEY) || "{}");
     session.onboarded = true;
     session.name = name;
@@ -82,6 +90,7 @@ export default function OnboardingPage() {
         moveDate,
         answers,
         role,
+        restart,
       }),
     });
     if (!res.ok) {
