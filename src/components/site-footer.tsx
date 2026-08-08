@@ -9,15 +9,23 @@ const columns = [
     links: [
       { href: "/how-it-works", label: "How it works" },
       { href: "/map", label: "The Map" },
+      { href: "/chat", label: "Chat" },
       { href: "/matches", label: "Your buddy" },
       { href: "/dashboard", label: "Dashboard" },
     ],
   },
   {
-    title: "Buddy",
+    title: "Explore",
     links: [
+      { href: "/community", label: "The lounge" },
+      { href: "/places", label: "Country guides" },
       { href: "/about", label: "The story" },
       { href: "/safety", label: "Safety" },
+    ],
+  },
+  {
+    title: "Buddy",
+    links: [
       { href: "/signup", label: "Get a buddy" },
       { href: "/login", label: "Log in" },
     ],

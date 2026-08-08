@@ -313,6 +313,90 @@ export default function Home() {
           </div>
         </section>
 
+        {/* THE LOUNGE — community, chat, guides */}
+        <section className="border-t-2 border-ink/80">
+          <Signage tag="The lounge">
+            Everyone, everywhere.
+          </Signage>
+          <div className="mx-auto grid w-full max-w-6xl gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_1.3fr] lg:items-center lg:py-20">
+            <div>
+              <p className="board text-[11px] tracking-[0.22em] text-ink/55">
+                Community · chat · field guides
+              </p>
+              <h2 className="mt-3 font-display text-4xl uppercase leading-[1.02] tracking-tight text-ink sm:text-5xl">
+                You&apos;re never the only one landing.
+              </h2>
+              <p className="mt-5 max-w-lg leading-relaxed text-ink/70">
+                One <strong className="text-ink">global lounge</strong> for
+                all of Buddy, plus a room for{" "}
+                <strong className="text-ink">every country on earth</strong>.
+                Ask the room anything, or read the field guide — good places,
+                how people your age make friends, and the unwritten rules —
+                written for every one of the 250 places a kid could land.
+              </p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Button asChild>
+                  <Link href="/community">
+                    Join the lounge <ArrowRight />
+                  </Link>
+                </Button>
+                <Button variant="outline" asChild>
+                  <Link href="/places">Browse 250 guides</Link>
+                </Button>
+              </div>
+            </div>
+
+            {/* Three gates — the concourse */}
+            <div className="grid gap-4 sm:grid-cols-3">
+              {[
+                {
+                  gate: "GATE GLOBAL",
+                  title: "The lounge",
+                  body: "Everyone, everywhere — one room.",
+                  href: "/community",
+                },
+                {
+                  gate: "GATE YOURS",
+                  title: "Your country",
+                  body: "Good places, real intel, the kids there now.",
+                  href: "/community",
+                },
+                {
+                  gate: "GATE 250",
+                  title: "Field guides",
+                  body: "Every country on earth, one ticket each.",
+                  href: "/places",
+                },
+              ].map((g) => (
+                <Link
+                  key={g.gate}
+                  href={g.href}
+                  className="group flex h-full flex-col border-2 border-ink/30 bg-paper shadow-[3px_3px_0_0_rgba(22,19,14,0.14)] transition-colors hover:border-ink"
+                >
+                  <div className="perf border-b border-dashed border-ink/30" aria-hidden />
+                  <div className="flex flex-1 flex-col p-4">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="board text-[9px] tracking-[0.25em] text-amber-deep">
+                        {g.gate}
+                      </span>
+                      <Barcode seed={g.gate} className="h-4 w-12 shrink-0" />
+                    </div>
+                    <p className="mt-3 font-display text-xl uppercase leading-none tracking-tight">
+                      {g.title}
+                    </p>
+                    <p className="mt-2 text-xs leading-relaxed text-ink/60">
+                      {g.body}
+                    </p>
+                    <span className="board mt-auto flex items-center gap-1 pt-4 text-[10px] tracking-[0.2em] text-ink/50 transition-colors group-hover:text-amber-deep">
+                      BOARD <ArrowRight className="size-3" />
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* NOW BOARDING — the close */}
         <section className="border-t-2 border-ink bg-ink text-paper">
           <div className="mx-auto w-full max-w-6xl px-4 py-16 text-center sm:px-6 sm:py-20">

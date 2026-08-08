@@ -47,7 +47,18 @@ create table public.messages (
   id uuid default gen_random_uuid() primary key,
   match_id uuid references public.matches(id) on delete cascade,
   sender uuid references public.profiles(id) on delete cascade,
-  body text not null,
+  body text not null check (char_length(body) between 1 and 500),
+  created_at timestamptz default now()
+);
+
+-- Community rooms: a global room plus one per country. The departure
+-- lounge — readable by anyone, posting requires an account.
+create table public.community_messages (
+  id uuid default gen_random_uuid() primary key,
+  room text not null check (room = 'global' or char_length(room) between 2 and 64),
+  sender uuid references public.profiles(id) on delete cascade,
+  sender_name text not null,
+  body text not null check (char_length(body) between 1 and 500),
   created_at timestamptz default now()
 );
 
@@ -133,15 +144,32 @@ create policy "match missions" on public.missions
     match_id in (select id from public.matches where auth.uid() in (mover, buddy))
   );
 
--- Messages: visible to the two people in the match.
+-- Messages: visible to the two people in the match, and the sender
+-- must be the writer — no spoofing someone else's match messages.
 create policy "match messages" on public.messages
   for all to authenticated
   using (
     match_id in (select id from public.matches where auth.uid() in (mover, buddy))
   )
   with check (
-    match_id in (select id from public.matches where auth.uid() in (mover, buddy))
+    auth.uid() = sender
+    and match_id in (select id from public.matches where auth.uid() in (mover, buddy))
   );
+
+-- Community: the lounge is open to read, only members write.
+alter table public.community_messages enable row level security;
+
+create policy "community read" on public.community_messages
+  for select to anon, authenticated using (true);
+
+create policy "community write" on public.community_messages
+  for insert to authenticated
+  with check (
+    auth.uid() = sender
+    and char_length(body) between 1 and 500
+  );
+
+create index community_room_created on public.community_messages (room, created_at desc);
 
 -- Anchors: anyone can read anchor answers (answers only, no contact).
 create policy "anchors public answers" on public.anchors
@@ -166,8 +194,9 @@ create policy "report owner" on public.reports
 
 grant usage on schema public to anon, authenticated;
 
-grant select on public.arrivals, public.anchors to anon;
+grant select on public.arrivals, public.anchors, public.community_messages to anon;
 
 grant all on public.profiles, public.matches, public.missions,
-  public.messages, public.anchors, public.arrivals, public.reports
+  public.messages, public.anchors, public.arrivals, public.reports,
+  public.community_messages
   to authenticated;
