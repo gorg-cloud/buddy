@@ -18,6 +18,7 @@ create table public.profiles (
   move_date date,
   answers jsonb default '{}'::jsonb,   -- questions-first profile
   languages text[] default '{}',
+  avatar_url text,                     -- public storage URL, shown to matches
   carried int default 0,                -- the Chain: kids you've helped
   created_at timestamptz default now()
 );
@@ -200,3 +201,22 @@ grant all on public.profiles, public.matches, public.missions,
   public.messages, public.anchors, public.arrivals, public.reports,
   public.community_messages
   to authenticated;
+
+-- ============================================================
+-- Profile pictures (storage)
+-- ============================================================
+
+insert into storage.buckets (id, name, public)
+values ('avatars', 'avatars', true)
+on conflict (id) do update set public = true;
+
+-- Anyone can view avatars (they're shown to matches); only the owner
+-- can upload or replace their own.
+create policy "avatars read" on storage.objects
+  for select to anon, authenticated using (bucket_id = 'avatars');
+
+create policy "avatars upload" on storage.objects
+  for insert to authenticated with check (bucket_id = 'avatars' and owner = auth.uid());
+
+create policy "avatars update" on storage.objects
+  for update to authenticated using (bucket_id = 'avatars' and owner = auth.uid());

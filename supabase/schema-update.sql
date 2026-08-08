@@ -50,3 +50,22 @@ create policy "match messages" on public.messages
 -- Data API access.
 grant select on public.community_messages to anon;
 grant all on public.community_messages to authenticated;
+
+-- ============================================================
+-- Profile pictures
+-- ============================================================
+
+alter table public.profiles add column if not exists avatar_url text;
+
+insert into storage.buckets (id, name, public)
+values ('avatars', 'avatars', true)
+on conflict (id) do update set public = true;
+
+create policy "avatars read" on storage.objects
+  for select to anon, authenticated using (bucket_id = 'avatars');
+
+create policy "avatars upload" on storage.objects
+  for insert to authenticated with check (bucket_id = 'avatars' and owner = auth.uid());
+
+create policy "avatars update" on storage.objects
+  for update to authenticated using (bucket_id = 'avatars' and owner = auth.uid());

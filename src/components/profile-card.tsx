@@ -29,9 +29,18 @@ export function ProfileCard({
 
       <div className="flex items-start justify-between gap-3 p-5">
         <div className="flex items-center gap-3">
-          <span className="board flex size-11 shrink-0 items-center justify-center bg-ink text-sm font-bold text-paper">
-            {initials(profile.name)}
-          </span>
+          {profile.avatarUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={profile.avatarUrl}
+              alt={`${profile.name}'s photo`}
+              className="size-11 shrink-0 border-2 border-ink object-cover"
+            />
+          ) : (
+            <span className="board flex size-11 shrink-0 items-center justify-center bg-ink text-sm font-bold text-paper">
+              {initials(profile.name)}
+            </span>
+          )}
           <div>
             <p className="font-display text-xl uppercase leading-none tracking-tight text-ink">
               {profile.name}{" "}

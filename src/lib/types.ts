@@ -14,6 +14,7 @@ export interface BuddyProfile {
   answers: Record<string, string>; // questions-first profile
   carried: number; // how many kids this person has helped (the Chain)
   languages: string[];
+  avatarUrl?: string; // public storage URL — shown to matches
 }
 
 export interface AnchorProfile {

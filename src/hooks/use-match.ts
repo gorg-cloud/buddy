@@ -37,6 +37,7 @@ function toBuddyProfile(row: Record<string, unknown>): BuddyProfile {
     answers: (row.answers as Record<string, string>) ?? {},
     carried: Number(row.carried ?? 0),
     languages: Array.isArray(row.languages) ? row.languages : [],
+    avatarUrl: row.avatar_url ? String(row.avatar_url) : undefined,
   };
 }
 

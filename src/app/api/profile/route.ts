@@ -53,6 +53,7 @@ export async function POST(request: Request) {
     answers,
     role,
     restart,
+    avatarUrl,
   } = body;
 
   const { error } = await supabase.from("profiles").upsert({
@@ -66,13 +67,14 @@ export async function POST(request: Request) {
     move_date: moveDate || null,
     answers: answers ?? {},
     role: role ?? "mover",
+    avatar_url: typeof avatarUrl === "string" ? avatarUrl : null,
   });
 
   if (error) {
     const friendly = /could not find the table|does not exist|schema cache/i.test(
       error.message
     )
-      ? "The database isn't set up yet — run supabase/schema.sql in the Supabase SQL editor, then try again."
+      ? "The database needs one more update — run supabase/schema-update.sql in the Supabase SQL editor, then try again."
       : error.message;
     return NextResponse.json({ error: friendly }, { status: 500 });
   }

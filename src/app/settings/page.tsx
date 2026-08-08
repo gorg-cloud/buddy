@@ -2,7 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { KeyRound, Save, ShieldCheck, Trash2, UserRound } from "lucide-react";
+import {
+  Camera,
+  KeyRound,
+  Save,
+  ShieldCheck,
+  Trash2,
+  UserRound,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { CountryPicker } from "@/components/country-picker";
@@ -47,6 +54,8 @@ export default function SettingsPage() {
   const [country, setCountry] = useState("");
   const [moveDate, setMoveDate] = useState("");
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [avatarBusy, setAvatarBusy] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const [pw, setPw] = useState("");
@@ -71,6 +80,7 @@ export default function SettingsPage() {
           setSchool(String(me.school ?? ""));
           setCountry(String(me.country ?? ""));
           setMoveDate(String(me.move_date ?? ""));
+          setAvatarUrl(String(me.avatar_url ?? ""));
           setAnswers(
             me.answers && typeof me.answers === "object" ? me.answers : {}
           );
@@ -103,6 +113,7 @@ export default function SettingsPage() {
           answers,
           role,
           restart: false,
+          avatarUrl,
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -114,6 +125,51 @@ export default function SettingsPage() {
     } finally {
       setSaving(false);
     }
+  }
+
+  async function uploadAvatar(file: File) {
+    if (!file.type.startsWith("image/")) {
+      toast.error("That's not an image");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Keep it under 2MB");
+      return;
+    }
+    if (!isSupabaseConfigured()) {
+      toast.error("Supabase isn't connected yet");
+      return;
+    }
+    setAvatarBusy(true);
+    try {
+      const supabase = getSupabase();
+      const {
+        data: { user },
+      } = await supabase!.auth.getUser();
+      if (!user) {
+        toast.error("Not signed in");
+        return;
+      }
+      const ext = file.name.split(".").pop()?.toLowerCase() || "png";
+      const path = `${user.id}.${ext}`;
+      const { error } = await supabase!.storage
+        .from("avatars")
+        .upload(path, file, { upsert: true, cacheControl: "3600" });
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      const { data: pub } = supabase!.storage.from("avatars").getPublicUrl(path);
+      setAvatarUrl(pub.publicUrl);
+      toast.success("Photo ready — save your profile to keep it");
+    } finally {
+      setAvatarBusy(false);
+    }
+  }
+
+  function removeAvatar() {
+    setAvatarUrl("");
+    toast.success("Photo removed — save your profile to keep it");
   }
 
   async function changePassword(e: React.FormEvent) {
@@ -192,7 +248,60 @@ export default function SettingsPage() {
                 <p className="board flex items-center gap-2 text-[11px] tracking-[0.25em] text-amber-deep">
                   <UserRound className="size-4" /> YOUR PROFILE
                 </p>
-                <div className="mt-5 grid gap-5 sm:grid-cols-2">
+
+                <div className="mt-5 flex items-center gap-4">
+                  {avatarUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={avatarUrl}
+                      alt="Your profile photo"
+                      className="size-20 shrink-0 border-2 border-ink object-cover"
+                    />
+                  ) : (
+                    <span className="board flex size-20 shrink-0 items-center justify-center border-2 border-ink bg-ink text-xl font-bold text-paper">
+                      {name
+                        .split(/\s+/)
+                        .slice(0, 2)
+                        .map((w) => w[0]?.toUpperCase() ?? "")
+                        .join("") || "?"}
+                    </span>
+                  )}
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <label className="board inline-flex cursor-pointer items-center gap-2 border-2 border-ink bg-ink px-3 py-2 text-[11px] tracking-[0.18em] text-paper transition-colors hover:bg-ink/90">
+                        <Camera className="size-3.5" />
+                        {avatarBusy ? "Uploading…" : "Upload photo"}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          disabled={avatarBusy}
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) uploadAvatar(f);
+                            e.target.value = "";
+                          }}
+                        />
+                      </label>
+                      {avatarUrl && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={removeAvatar}
+                        >
+                          Remove
+                        </Button>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      PNG or JPG, under 2MB. Shown to your matches and on your
+                      card.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-6 grid gap-5 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="name">Name</Label>
                     <Input
