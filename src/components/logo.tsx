@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { TreeMark } from "@/components/tree-mark";
 import { cn } from "@/lib/utils";
 
 export function Logo({
@@ -20,21 +21,11 @@ export function Logo({
     >
       <span
         className={cn(
-          "relative flex size-9 shrink-0 items-center justify-center border-2 bg-ink transition-transform group-hover:-rotate-3",
-          on === "ink" ? "border-paper/50" : "border-ink"
+          "flex size-9 shrink-0 items-center justify-center rounded-[7px] bg-ink transition-transform group-hover:-rotate-3",
+          on === "ink" ? "border-2 border-paper/50" : "border-2 border-ink"
         )}
-        aria-hidden
       >
-        {/* punched hole */}
-        <span
-          className={cn(
-            "absolute top-1 left-1 size-2 rounded-full",
-            on === "ink" ? "bg-ink" : "bg-concrete"
-          )}
-        />
-        <span className="board text-sm font-bold text-amber">B</span>
-        {/* barcode sliver */}
-        <span className="absolute inset-x-1 bottom-1 h-[3px] bg-amber [mask-image:repeating-linear-gradient(90deg,black_0_2px,transparent_2px_4px)]" />
+        <TreeMark className="size-6.5" />
       </span>
       <span
         className={cn(
