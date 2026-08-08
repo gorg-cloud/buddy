@@ -4,6 +4,29 @@ import { isSupabaseConfigured } from "@/lib/auth";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
+/** The signed-in kid's own profile — powers the settings form. */
+export async function GET() {
+  if (!isSupabaseConfigured()) {
+    return NextResponse.json({ real: false });
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ signedIn: false });
+  }
+
+  const { data: me } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  return NextResponse.json({ signedIn: true, me });
+}
+
 export async function POST(request: Request) {
   if (!isSupabaseConfigured()) {
     return NextResponse.json({ real: false });

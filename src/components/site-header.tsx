@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LogOut, Menu } from "lucide-react";
+import { LogOut, Menu, Settings as SettingsIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -111,6 +111,11 @@ export function SiteHeader() {
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/dashboard">Dashboard</Link>
               </Button>
+              <Button variant="ghost" size="icon" asChild aria-label="Settings">
+                <Link href="/settings" title="Settings">
+                  <SettingsIcon />
+                </Link>
+              </Button>
               <Button
                 variant="ghost"
                 size="sm"
@@ -168,6 +173,9 @@ export function SiteHeader() {
                   <>
                     <Button asChild>
                       <Link href="/dashboard">Dashboard</Link>
+                    </Button>
+                    <Button variant="outline" asChild>
+                      <Link href="/settings">Settings</Link>
                     </Button>
                     <Button variant="outline" onClick={logout}>
                       Log out <LogOut />
