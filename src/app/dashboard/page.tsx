@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowRight, CalendarClock, Handshake } from "lucide-react";
 
 import { MissionCard } from "@/components/mission-card";
@@ -12,10 +13,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { currentUser, missions, profiles } from "@/lib/demo-data";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useMatch } from "@/hooks/use-match";
 import { daysUntil } from "@/lib/utils";
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const { loading, real, me, buddy, missions } = useMatch();
   const [greeting, setGreeting] = useState("You");
   const [mounted, setMounted] = useState(false);
 
@@ -31,13 +35,16 @@ export default function DashboardPage() {
     }
   }, []);
 
-  const landingDate = currentUser.moveDate!;
-  const days = mounted ? daysUntil(landingDate) : 0;
-  const buddy = profiles.find(
-    (p) => p.role === "buddy" && p.to === currentUser.to
-  );
+  // Real mode: if you're signed in but haven't finished onboarding, go build your profile.
+  useEffect(() => {
+    if (!loading && real && !me) router.push("/onboarding");
+  }, [loading, real, me, router]);
+
+  const days = me?.moveDate && mounted ? daysUntil(me.moveDate) : 0;
   const doneCount = missions.filter((m) => m.done).length;
-  const pct = Math.round((doneCount / missions.length) * 100);
+  const pct = missions.length
+    ? Math.round((doneCount / missions.length) * 100)
+    : 0;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -47,37 +54,49 @@ export default function DashboardPage() {
         {/* Countdown band */}
         <section className="border-b border-border/70 bg-card/50">
           <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
-            <p className="board text-xs text-primary">
-              ● YOUR LANDING · {currentUser.from} → {currentUser.to}
-            </p>
-            <div className="mt-4 flex flex-wrap items-end justify-between gap-6">
-              <div>
-                <p className="board text-6xl font-bold text-foreground sm:text-7xl">
-                  {days}
-                </p>
-                <p className="board mt-1 text-xs text-muted-foreground">
-                  {days === 0
-                    ? "TODAY. YOU'VE GOT THIS."
-                    : days === 1
-                      ? "DAY UNTIL YOU LAND"
-                      : "DAYS UNTIL YOU LAND"}
-                </p>
+            {loading ? (
+              <div className="space-y-3">
+                <Skeleton className="h-4 w-48" />
+                <Skeleton className="h-16 w-40" />
               </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <CalendarClock className="size-4 text-primary" />
-                {buddy ? (
-                  <span>
-                    Your buddy is{" "}
-                    <Link href="/matches" className="text-foreground underline underline-offset-4 hover:text-primary">
-                      {buddy.name}
-                    </Link>{" "}
-                    — already waiting
-                  </span>
-                ) : (
-                  <span>Still matching you — check back soon</span>
-                )}
-              </div>
-            </div>
+            ) : (
+              <>
+                <p className="board text-xs text-primary">
+                  ● YOUR LANDING · {me?.from ?? "—"} → {me?.to ?? "—"}
+                </p>
+                <div className="mt-4 flex flex-wrap items-end justify-between gap-6">
+                  <div>
+                    <p className="board text-6xl font-bold text-foreground sm:text-7xl">
+                      {days}
+                    </p>
+                    <p className="board mt-1 text-xs text-muted-foreground">
+                      {days === 0
+                        ? "TODAY. YOU'VE GOT THIS."
+                        : days === 1
+                          ? "DAY UNTIL YOU LAND"
+                          : "DAYS UNTIL YOU LAND"}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <CalendarClock className="size-4 text-primary" />
+                    {buddy ? (
+                      <span>
+                        Your buddy is{" "}
+                        <Link
+                          href="/matches"
+                          className="text-foreground underline underline-offset-4 hover:text-primary"
+                        >
+                          {buddy.name}
+                        </Link>{" "}
+                        — already waiting
+                      </span>
+                    ) : (
+                      <span>Still matching you — check back soon</span>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
 
             <div className="mt-6">
               <div className="mb-2 flex justify-between text-xs text-muted-foreground">
@@ -107,15 +126,27 @@ export default function DashboardPage() {
               small talk — just things to do together.
             </p>
             <div className="mt-6 space-y-3">
-              {missions.map((mission) => (
-                <MissionCard key={mission.id} mission={mission} />
-              ))}
+              {missions.length === 0 ? (
+                <Card>
+                  <CardContent className="py-10 text-center text-sm text-muted-foreground">
+                    No missions yet. {buddy ? "Say hello to get started." : "They'll appear when you're matched."}
+                  </CardContent>
+                </Card>
+              ) : (
+                missions.map((mission) => (
+                  <MissionCard key={mission.id} mission={mission} />
+                ))
+              )}
             </div>
           </div>
 
           {/* Side column */}
           <div className="space-y-6">
-            <ProfileCard profile={currentUser} compact />
+            {me ? (
+              <ProfileCard profile={me} compact />
+            ) : (
+              <Skeleton className="h-64 w-full" />
+            )}
 
             {buddy && (
               <Card>
@@ -127,8 +158,9 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <p className="text-sm text-muted-foreground">
-                    {buddy.name} is at {buddy.school}, matching your move to{" "}
-                    {buddy.to}. Say hello when you&apos;re ready.
+                    {buddy.name} is at {buddy.school || "their school"}, matching
+                    your move to {buddy.to || "your destination"}. Say hello
+                    when you&apos;re ready.
                   </p>
                   <Button asChild className="w-full">
                     <Link href="/matches">
@@ -149,7 +181,7 @@ export default function DashboardPage() {
                 <p className="text-sm leading-relaxed text-muted-foreground">
                   You&apos;ll know this place. Then it&apos;s your turn: become
                   the buddy for the next kid arriving at{" "}
-                  {currentUser.school}. The chain continues.
+                  {me?.school || "your school"}. The chain continues.
                 </p>
               </CardContent>
             </Card>

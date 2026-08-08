@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Logo } from "@/components/logo";
-import { SESSION_KEY } from "@/lib/auth";
+import { SESSION_KEY, isSupabaseConfigured } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 const questions = [
@@ -52,7 +52,7 @@ export default function OnboardingPage() {
   const [moveDate, setMoveDate] = useState("");
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
-  function save() {
+  async function save() {
     const session = JSON.parse(localStorage.getItem(SESSION_KEY) || "{}");
     session.onboarded = true;
     session.name = name;
@@ -61,6 +61,25 @@ export default function OnboardingPage() {
       "buddy:profile",
       JSON.stringify({ name, age, from, to, school, country, moveDate, answers })
     );
+
+    if (isSupabaseConfigured()) {
+      await fetch("/api/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          age,
+          from,
+          to,
+          school,
+          country,
+          moveDate,
+          answers,
+          role: session.role ?? "mover",
+        }),
+      });
+    }
+
     toast.success("Profile saved — finding your buddy");
     router.push("/dashboard");
   }

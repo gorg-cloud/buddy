@@ -40,8 +40,17 @@ npm run dev
 
 1. Create a free project at [supabase.com](https://supabase.com).
 2. Open **SQL Editor → New query**, paste the contents of [`supabase/schema.sql`](supabase/schema.sql), run it.
-3. Copy **Project Settings → API** keys into `.env.local` (see [`.env.local.example`](.env.local.example)).
+3. Copy **Project Settings → API** keys into `.env.local`:
+   - `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (public)
+   - `SUPABASE_SERVICE_ROLE_KEY` (**secret**, server-only — the matching engine needs it to find buddy profiles)
+   See [`.env.local.example`](.env.local.example).
 4. Restart `npm run dev`. Real accounts now work.
+
+**How matching works:** finish onboarding → your profile is saved → the
+matching engine pairs you with the buddy in your destination country
+closest to your age → a match + starter missions are created automatically.
+No matches yet? You'll see the waiting state and get matched the moment a
+buddy signs up there.
 
 ## Deploy
 

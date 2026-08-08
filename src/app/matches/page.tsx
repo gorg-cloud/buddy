@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowRight, Handshake, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
@@ -10,13 +12,16 @@ import { SiteHeader } from "@/components/site-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { currentUser, profiles } from "@/lib/demo-data";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useMatch } from "@/hooks/use-match";
 
 export default function MatchesPage() {
-  const buddy = profiles.find(
-    (p) => p.role === "buddy" && p.to === currentUser.to
-  );
-  const peer = profiles.find((p) => p.role === "mover" && p.id !== "me");
+  const router = useRouter();
+  const { loading, real, me, buddy } = useMatch();
+
+  useEffect(() => {
+    if (!loading && real && !me) router.push("/onboarding");
+  }, [loading, real, me, router]);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -31,14 +36,18 @@ export default function MatchesPage() {
             </h1>
             <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
               {buddy
-                ? `Matched by destination and age: ${buddy.name}, at ${buddy.school} in ${buddy.to}.`
+                ? `Matched by destination and age: ${buddy.name}, at ${
+                    buddy.school || "their school"
+                  } in ${buddy.to || "your destination"}.`
                 : "We're still matching you — check back soon."}
             </p>
           </div>
         </section>
 
         <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
-          {buddy ? (
+          {loading ? (
+            <Skeleton className="h-96 w-full" />
+          ) : buddy ? (
             <div className="grid gap-8 lg:grid-cols-[1.5fr_1fr]">
               <div>
                 <div className="mb-4 flex items-center gap-2">
@@ -46,7 +55,7 @@ export default function MatchesPage() {
                     MATCHED ✓
                   </Badge>
                   <span className="text-sm text-muted-foreground">
-                    {currentUser.from} → {buddy.to} · same destination, close
+                    {me?.from ?? "—"} → {buddy.to} · same destination, close
                     in age
                   </span>
                 </div>
@@ -93,9 +102,10 @@ export default function MatchesPage() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm leading-relaxed text-muted-foreground">
-                      Six months after you land at {currentUser.school}, you
-                      become the buddy for the next kid arriving there.
-                      {buddy.name} was carried. One day, you carry.
+                      Six months after you land at{" "}
+                      {me?.school || "your new school"}, you become the buddy
+                      for the next kid arriving there. {buddy.name} was
+                      carried. One day, you carry.
                     </p>
                   </CardContent>
                 </Card>
@@ -117,20 +127,6 @@ export default function MatchesPage() {
                 </Button>
               </CardContent>
             </Card>
-          )}
-
-          {peer && (
-            <div className="mt-14">
-              <h2 className="font-display text-xl font-bold">
-                Others moving your way
-              </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                You&apos;re not the only one making this journey.
-              </p>
-              <div className="mt-6 max-w-md">
-                <ProfileCard profile={peer} compact />
-              </div>
-            </div>
           )}
         </section>
       </main>

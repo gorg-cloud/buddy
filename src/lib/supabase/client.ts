@@ -1,18 +1,18 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
 
 import { isSupabaseConfigured } from "@/lib/auth";
 
-let client: SupabaseClient | null = null;
+let client: ReturnType<typeof createBrowserClient> | null = null;
 
 /**
- * Returns the Supabase client, or null in demo mode
- * (when NEXT_PUBLIC_SUPABASE_URL / ANON_KEY are not set).
+ * Browser Supabase client (cookie-backed so the server can read the
+ * session). Returns null in demo mode — when the env keys aren't set.
  */
-export function getSupabase(): SupabaseClient | null {
+export function getSupabase() {
   if (!isSupabaseConfigured()) return null;
   if (client) return client;
 
-  client = createClient(
+  client = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
