@@ -46,7 +46,12 @@ export async function POST(request: Request) {
   });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const friendly = /could not find the table|does not exist|schema cache/i.test(
+      error.message
+    )
+      ? "The database isn't set up yet — run supabase/schema.sql in the Supabase SQL editor, then try again."
+      : error.message;
+    return NextResponse.json({ error: friendly }, { status: 500 });
   }
 
   // Server-side extras (service role): arrivals for the public board and
